@@ -200,9 +200,30 @@ public class ChessPiece {
             }
 
             case PAWN -> {
-                int[][] legal_moves = {
-                        {-1, -1}, {-1, 0}, {-1, 1}, {0, 1}, {1, 1}, {1, 0}, {1, -1}, {0, -1}
-                };
+                int[][] whitelegalMoves = { {1, 0} };
+                int[][] whitefirstMove = { {2, 0} };
+                int[][] whitecaptures = { {1, -1}, {1,1} };
+
+                int[][] blacklegalMoves = { {-1, 0} };
+                int[][] blackfirstMove = { {-2, 0} };
+                int[][] blackcaptures = { {-1, -1}, {-1,1} };
+
+                if (this.getTeamColor() == ChessGame.TeamColor.WHITE){
+                    for (int[] move : whitelegalMoves){
+                        ChessPosition newPosition = new ChessPosition(myPosition.getRow() + move[0], myPosition.getColumn() + move[1]);
+                        if (newPosition.getRow() >= 1 && newPosition.getRow() <= 8 && newPosition.getColumn() >= 1 && newPosition.getColumn() <= 8) {
+                            if (board.getPiece(newPosition) == null || board.getPiece(newPosition).getTeamColor() != this.getTeamColor()) {
+                                ChessMove movetoAdd = new ChessMove(myPosition, newPosition, null);
+                                moves.add(movetoAdd);
+                            }
+                        }
+                    }
+                    if (myPosition.getRow() == 2){
+                        ChessPosition newPosition = new ChessPosition(myPosition.getRow(), myPosition.getColumn());
+                    }
+
+                }
+
 
                 for (int[] move : legal_moves) {
                     ChessPosition newPosition = new ChessPosition(myPosition.getRow() + move[0], myPosition.getColumn() + move[1]);
