@@ -38,7 +38,7 @@ public class ChessBoard {
      * @param piece    the piece to add
      */
     public void addPiece(ChessPosition position, ChessPiece piece) {
-        squares[position.getRow()][position.getColumn()] = piece;
+        squares[position.getRow() - 1][position.getColumn() - 1] = piece;
     }
 
     /**
@@ -49,7 +49,7 @@ public class ChessBoard {
      * position
      */
     public ChessPiece getPiece(ChessPosition position) {
-        return squares[position.getRow()][position.getColumn()];
+        return squares[position.getRow() - 1][position.getColumn() - 1];
     }
 
     /**
@@ -57,6 +57,28 @@ public class ChessBoard {
      * (How the game of chess normally starts)
      */
     public void resetBoard() {
-        throw new RuntimeException("Not implemented");
+        for (int row = 0; row < 8; row++){
+            for (int col = 0; col < 8; col++){
+                squares[row][col] = null;
+            }
+        }
+
+        ChessPiece.PieceType[] backrankOrder = {
+                ChessPiece.PieceType.ROOK,
+                ChessPiece.PieceType.KNIGHT,
+                ChessPiece.PieceType.BISHOP,
+                ChessPiece.PieceType.QUEEN,
+                ChessPiece.PieceType.KING,
+                ChessPiece.PieceType.BISHOP,
+                ChessPiece.PieceType.KNIGHT,
+                ChessPiece.PieceType.ROOK
+        };
+
+        for (int col = 1; col <= 8; col++){
+            addPiece(new ChessPosition(2, col), new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.PAWN));
+            addPiece(new ChessPosition(1, col), new ChessPiece(ChessGame.TeamColor.WHITE, backrankOrder[col-1]));
+            addPiece(new ChessPosition(7, col), new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.PAWN));
+            addPiece(new ChessPosition(8, col), new ChessPiece(ChessGame.TeamColor.BLACK, backrankOrder[col-1]));
+        }
     }
 }
