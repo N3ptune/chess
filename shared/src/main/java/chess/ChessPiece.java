@@ -73,11 +73,11 @@ public class ChessPiece {
         switch (getPieceType()) {
             case KING -> {
 
-                int[][] legal_moves = {
+                int[][] legalMoves = {
                         {-1, -1}, {-1, 0}, {-1, 1}, {0, 1}, {1, 1}, {1, 0}, {1, -1}, {0, -1}
                 };
 
-                for (int[] move : legal_moves) {
+                for (int[] move : legalMoves) {
                     ChessPosition newPosition = new ChessPosition(myPosition.getRow() + move[0], myPosition.getColumn() + move[1]);
                     if (newPosition.getRow() >= 1 && newPosition.getRow() <= 8 && newPosition.getColumn() >= 1 && newPosition.getColumn() <= 8) {
                         if (board.getPiece(newPosition) == null || board.getPiece(newPosition).getTeamColor() != this.getTeamColor()) {
@@ -90,52 +90,81 @@ public class ChessPiece {
 
             case QUEEN -> {
 
-                int[][] legal_moves = {
+                int[][] directions = {
                         {-1, -1}, {-1, 0}, {-1, 1}, {0, 1}, {1, 1}, {1, 0}, {1, -1}, {0, -1}
                 };
 
-                for (int[] move : legal_moves) {
-                    ChessPosition newPosition = new ChessPosition(myPosition.getRow() + move[0], myPosition.getColumn() + move[1]);
-                    if (newPosition.getRow() >= 1 && newPosition.getRow() <= 8 && newPosition.getColumn() >= 1 && newPosition.getColumn() <= 8) {
+                for (int[] direction : directions) {
+
+                    int row = myPosition.getRow() + direction[0];
+                    int col = myPosition.getColumn() + direction[1];
+
+                    while (row >= 1 && row <= 8 && col >= 1 && col <= 8){
+                        ChessPosition newPosition = new ChessPosition(row, col);
                         if (board.getPiece(newPosition) == null || board.getPiece(newPosition).getTeamColor() != this.getTeamColor()) {
                             ChessMove movetoAdd = new ChessMove(myPosition, newPosition, null);
                             moves.add(movetoAdd);
                         }
+                        break;
                     }
+                    row += direction[0];
+                    col += direction[1];
                 }
             }
 
             case ROOK -> {
 
-                int[][] legal_moves = {
-                        {-1, -1}, {-1, 0}, {-1, 1}, {0, 1}, {1, 1}, {1, 0}, {1, -1}, {0, -1}
+                int[][] directions = {
+                        {-1, 0}, {0, 1}, {1, 0}, {0, -1}
                 };
 
-                for (int[] move : legal_moves) {
-                    ChessPosition newPosition = new ChessPosition(myPosition.getRow() + move[0], myPosition.getColumn() + move[1]);
-                    if (newPosition.getRow() >= 1 && newPosition.getRow() <= 8 && newPosition.getColumn() >= 1 && newPosition.getColumn() <= 8) {
-                        if (board.getPiece(newPosition) == null || board.getPiece(newPosition).getTeamColor() != this.getTeamColor()) {
+                for (int[] direction : directions) {
+
+                    int row = myPosition.getRow() + direction[0];
+                    int col = myPosition.getColumn() + direction[1];
+
+                    while (row >= 1 && row <= 8 && col >= 1 && col <= 8){
+                        ChessPosition newPosition = new ChessPosition(row, col);
+                        if (board.getPiece(newPosition) == null) {
                             ChessMove movetoAdd = new ChessMove(myPosition, newPosition, null);
                             moves.add(movetoAdd);
                         }
+                        else {
+                            if (board.getPiece(newPosition).getTeamColor() != this.getTeamColor()){
+                                ChessMove movetoAdd = new ChessMove(myPosition, newPosition, null);
+                                moves.add(movetoAdd);
+                            }
+                            break;
+                        }
+                        row += direction[0];
+                        col += direction[1];
                     }
+
                 }
             }
 
+
             case BISHOP -> {
 
-                int[][] legal_moves = {
-                        {-1, -1}, {-1, 0}, {-1, 1}, {0, 1}, {1, 1}, {1, 0}, {1, -1}, {0, -1}
+                int[][] directions = {
+                        {-1, -1}, {-1, 1}, {1, 1}, {1, -1}
                 };
 
-                for (int[] move : legal_moves) {
-                    ChessPosition newPosition = new ChessPosition(myPosition.getRow() + move[0], myPosition.getColumn() + move[1]);
-                    if (newPosition.getRow() >= 1 && newPosition.getRow() <= 8 && newPosition.getColumn() >= 1 && newPosition.getColumn() <= 8) {
+                for (int[] direction : directions) {
+
+                    int row = myPosition.getRow() + direction[0];
+                    int col = myPosition.getColumn() + direction[1];
+
+                    while (row >= 1 && row <= 8 && col >= 1 && col <= 8){
+                        ChessPosition newPosition = new ChessPosition(row, col);
                         if (board.getPiece(newPosition) == null || board.getPiece(newPosition).getTeamColor() != this.getTeamColor()) {
                             ChessMove movetoAdd = new ChessMove(myPosition, newPosition, null);
                             moves.add(movetoAdd);
                         }
+                        break;
                     }
+                    row += direction[0];
+                    col += direction[1];
                 }
             }
 
