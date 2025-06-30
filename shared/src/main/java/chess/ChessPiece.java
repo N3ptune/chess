@@ -101,14 +101,21 @@ public class ChessPiece {
 
                     while (row >= 1 && row <= 8 && col >= 1 && col <= 8){
                         ChessPosition newPosition = new ChessPosition(row, col);
-                        if (board.getPiece(newPosition) == null || board.getPiece(newPosition).getTeamColor() != this.getTeamColor()) {
+                        if (board.getPiece(newPosition) == null) {
                             ChessMove movetoAdd = new ChessMove(myPosition, newPosition, null);
                             moves.add(movetoAdd);
                         }
-                        break;
+                        else {
+                            if (board.getPiece(newPosition).getTeamColor() != this.getTeamColor()){
+                                ChessMove movetoAdd = new ChessMove(myPosition, newPosition, null);
+                                moves.add(movetoAdd);
+                            }
+                            break;
+                        }
+                        row += direction[0];
+                        col += direction[1];
                     }
-                    row += direction[0];
-                    col += direction[1];
+
                 }
             }
 
@@ -157,14 +164,21 @@ public class ChessPiece {
 
                     while (row >= 1 && row <= 8 && col >= 1 && col <= 8){
                         ChessPosition newPosition = new ChessPosition(row, col);
-                        if (board.getPiece(newPosition) == null || board.getPiece(newPosition).getTeamColor() != this.getTeamColor()) {
+                        if (board.getPiece(newPosition) == null) {
                             ChessMove movetoAdd = new ChessMove(myPosition, newPosition, null);
                             moves.add(movetoAdd);
                         }
-                        break;
+                        else {
+                            if (board.getPiece(newPosition).getTeamColor() != this.getTeamColor()){
+                                ChessMove movetoAdd = new ChessMove(myPosition, newPosition, null);
+                                moves.add(movetoAdd);
+                            }
+                            break;
+                        }
+                        row += direction[0];
+                        col += direction[1];
                     }
-                    row += direction[0];
-                    col += direction[1];
+
                 }
             }
 
