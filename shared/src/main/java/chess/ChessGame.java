@@ -2,6 +2,7 @@ package chess;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Objects;
 
 /**
  * For a class that can manage a chess game, making moves on a board
@@ -14,10 +15,22 @@ public class ChessGame {
     private TeamColor teamTurn = TeamColor.WHITE;
     private ChessBoard board = new ChessBoard();
 
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        ChessGame chessGame = (ChessGame) o;
+        return teamTurn == chessGame.teamTurn && Objects.equals(board, chessGame.board);
+    }
 
+    @Override
+    public int hashCode() {
+        return Objects.hash(teamTurn, board);
+    }
 
     public ChessGame() {
-
+        board.resetBoard();
     }
 
     /**
@@ -52,7 +65,7 @@ public class ChessGame {
      * startPosition
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
-        ChessPiece capturedPiece = null;
+
         ChessPiece piece = board.getPiece(startPosition);
         if (piece == null){
             return new ArrayList<>();
@@ -61,6 +74,8 @@ public class ChessGame {
         Collection<ChessMove> validMoves = new ArrayList<>();
 
         for (ChessMove move : allMoves){
+            ChessPiece capturedPiece = board.getPiece(move.getEndPosition());
+
             if (board.getPiece(move.getEndPosition()) != null){
                 capturedPiece = board.getPiece(move.getEndPosition());
             }
@@ -89,6 +104,7 @@ public class ChessGame {
      * @throws InvalidMoveException if move is invalid
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
+
         ChessPiece piece = board.getPiece(move.getStartPosition());
         if (piece == null){
             throw new InvalidMoveException("No piece to move");
@@ -125,6 +141,7 @@ public class ChessGame {
      * @return True if the specified team is in check
      */
     public boolean isInCheck(TeamColor teamColor) {
+
         ChessPosition kingPosition = findKing(teamColor);
 
         for (int row = 1; row <= 8; row++){
@@ -221,6 +238,7 @@ public class ChessGame {
     }
 
     public ChessPosition findKing(ChessGame.TeamColor color){
+
         for (int row = 1; row <= 8; row++){
             for (int col = 1; col <= 8; col++){
                 ChessPosition position = new ChessPosition(row, col);
@@ -234,6 +252,7 @@ public class ChessGame {
     }
 
     public void undoMove(ChessMove move, ChessPiece capturedPiece, ChessPiece piece){
+        
         board.addPiece(move.getStartPosition(), piece);
         if (capturedPiece != null){
             board.addPiece(move.getEndPosition(), capturedPiece);
