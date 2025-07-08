@@ -97,6 +97,9 @@ public class ChessGame {
         if (piece == null){
             throw new InvalidMoveException("No piece to move");
         }
+        if (piece.getTeamColor() != teamTurn){
+            throw new InvalidMoveException("Wrong color piece, friend");
+        }
 
         Collection<ChessMove> validMoves = validMoves(move.getStartPosition());
 
@@ -110,6 +113,12 @@ public class ChessGame {
             board.addPiece(move.getEndPosition(), new ChessPiece(piece.getTeamColor(), move.getPromotionPiece()));
         }else {
             board.addPiece(move.getEndPosition(), piece);
+        }
+
+        if (piece.getTeamColor() == TeamColor.WHITE){
+            teamTurn = TeamColor.BLACK;
+        } else {
+            teamTurn = TeamColor.WHITE;
         }
     }
 
