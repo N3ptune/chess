@@ -81,6 +81,12 @@ public class ChessGame {
                 }
             } else {
                 validMoves.add(move);
+                board.addPiece(move.getStartPosition(), piece);
+                if (capturedPiece != null){
+                    board.addPiece(move.getEndPosition(), capturedPiece);
+                } else {
+                    board.addPiece(move.getEndPosition(), null);
+                }
             }
         }
         return validMoves;
