@@ -73,20 +73,10 @@ public class ChessGame {
             }
 
             if (isInCheck(piece.getTeamColor())){
-                board.addPiece(move.getStartPosition(), piece);
-                if (capturedPiece != null){
-                    board.addPiece(move.getEndPosition(), capturedPiece);
-                } else {
-                    board.addPiece(move.getEndPosition(), null);
-                }
+                undoMove(move, capturedPiece, piece);
             } else {
                 validMoves.add(move);
-                board.addPiece(move.getStartPosition(), piece);
-                if (capturedPiece != null){
-                    board.addPiece(move.getEndPosition(), capturedPiece);
-                } else {
-                    board.addPiece(move.getEndPosition(), null);
-                }
+                undoMove(move, capturedPiece, piece);
             }
         }
         return validMoves;
@@ -227,5 +217,14 @@ public class ChessGame {
             }
         }
         return null;
+    }
+
+    public void undoMove(ChessMove move, ChessPiece capturedPiece, ChessPiece piece){
+        board.addPiece(move.getStartPosition(), piece);
+        if (capturedPiece != null){
+            board.addPiece(move.getEndPosition(), capturedPiece);
+        } else {
+            board.addPiece(move.getEndPosition(), null);
+        }
     }
 }
