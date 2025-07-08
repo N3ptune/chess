@@ -163,11 +163,9 @@ public class ChessGame {
                 ChessPiece piece = board.getPiece(position);
 
                 if (piece != null && piece.getTeamColor() == teamColor){
-                    Collection<ChessMove> moves = piece.pieceMoves(board, position);
-                    for (ChessMove move : moves){
-                        if (!isInCheck(teamColor)){
-                            return false;
-                        }
+                    Collection<ChessMove> validMoves = validMoves(position);
+                    if (!validMoves.isEmpty()){
+                        return false;
                     }
                 }
             }
@@ -192,10 +190,9 @@ public class ChessGame {
 
                     if (piece != null && piece.getTeamColor() == teamColor) {
                         Collection<ChessMove> moves = piece.pieceMoves(board, position);
-                        for (ChessMove move : moves) {
-                            if (!isInCheck(teamColor)) {
-                                return false;
-                            }
+                        Collection<ChessMove> validMoves = validMoves(position);
+                        if (!validMoves.isEmpty()){
+                            return false;
                         }
                     }
                 }
