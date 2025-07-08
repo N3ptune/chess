@@ -59,7 +59,6 @@ public class ChessGame {
         for (ChessMove move : allMoves){
             ChessBoard tempBoard = board;
             TeamColor checkCheck = this.teamTurn;
-            makeMove(move);
             if (!isInCheck(checkCheck)){
                 validMoves.add(move);
             } else {
@@ -76,7 +75,20 @@ public class ChessGame {
      * @throws InvalidMoveException if move is invalid
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
-        throw new RuntimeException("Not implemented");
+        ChessPiece piece = board.getPiece(move.getStartPosition());
+        if (piece == null){
+            throw new InvalidMoveException("No piece to move");
+        }
+
+        Collection<ChessMove> validMoves = validMoves(move.getStartPosition());
+
+        board.addPiece(move.getStartPosition(), null);
+
+        if (move.getPromotionPiece() != null){
+            board.addPiece(move.getEndPosition(), new ChessPiece(piece.getTeamColor(), move.getPromotionPiece()));
+        }else {
+            board.addPiece(move.getEndPosition(), piece);
+        }
     }
 
     /**
