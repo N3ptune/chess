@@ -10,7 +10,7 @@ public interface DataAccess {
     void clear();
     void createUser();
     UserData getUser();
-    void createAuth();
+    String createAuth(String username);
     AuthData getAuth();
     int createGame(GameData game);
     GameData getGame(int gameID);
