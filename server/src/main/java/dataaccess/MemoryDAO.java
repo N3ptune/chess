@@ -5,7 +5,6 @@ import model.GameData;
 import model.UserData;
 
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 
 public class MemoryDAO implements DataAccess{
 
