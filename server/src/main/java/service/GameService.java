@@ -49,7 +49,25 @@ public class GameService {
             return new JoinGameResult("Error: " + e.getMessage());
         }
     }
-    public CreateGameResult createGame(CreateGameRequest createGame){return new CreateGameResult();}
+    public CreateGameResult createGame(CreateGameRequest createGame){
+        try {
+
+            AuthData authData = dao.getAuth(createGame.authToken());
+
+            if (!createGame.authToken().equals(authData.authToken())){
+                return new CreateGameResult(null, "Error: unauthorized");
+            }
+
+            int gameID = dao.createGame(createGame.gameName());
+
+            GameData game = new GameData(gameID, null, null, createGame.gameName(), new ChessGame());
+
+            return new CreateGameResult(gameID, null);
+
+        } catch (DataAccessException e){
+            return new CreateGameResult(null, "Error: unauthourized");
+        }
+    }
     public ListGamesResult listGames(String authToken){
         return new ListGamesResult();
     }
