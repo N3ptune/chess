@@ -20,12 +20,12 @@ public class UserService {
     public RegisterResult register(RegisterRequest registerRequest) {
         try{
             if (registerRequest.username() == null || registerRequest.password() == null){
-                return new RegisterResult(null, null, "Error: username or password empty");
+                return new RegisterResult(null, null, "Error: bad request");
             }
 
             UserData existing = dao.getUser(registerRequest.username());
             if (existing != null){
-                return new RegisterResult(null, null, "Error: username already taken");
+                return new RegisterResult(null, null, "Error: already taken");
             }
 
             UserData newUser = new UserData(registerRequest.username(), registerRequest.password(), registerRequest.email());
@@ -42,7 +42,7 @@ public class UserService {
     public LoginResult login(LoginRequest loginRequest) {
         try{
             if (loginRequest.username() == null || loginRequest.password() == null){
-                return new LoginResult(null, null, "Error: username or password empty");
+                return new LoginResult(null, null, "Error: bad request");
             }
 
             UserData existing = dao.getUser(loginRequest.username());
