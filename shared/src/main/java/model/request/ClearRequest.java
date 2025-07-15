@@ -1,4 +1,4 @@
 package model.request;
 
-public class ClearRequest {
+public record ClearRequest() {
 }
