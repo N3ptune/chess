@@ -55,7 +55,7 @@ public class GameService {
             AuthData authData = dao.getAuth(createGame.authToken());
 
             if (!createGame.authToken().equals(authData.authToken())){
-                return new CreateGameResult(null, "Error: unauthorized");
+                return new CreateGameResult(-1, "Error: unauthorized");
             }
 
             int gameID = dao.createGame(createGame.gameName());
@@ -65,7 +65,7 @@ public class GameService {
             return new CreateGameResult(gameID, null);
 
         } catch (DataAccessException e){
-            return new CreateGameResult(null, "Error: unauthourized");
+            return new CreateGameResult(-1, "Error: unauthourized");
         }
     }
     public ListGamesResult listGames(String authToken){
