@@ -9,7 +9,7 @@ import spark.Response;
 import spark.Route;
 import com.google.gson.Gson;
 
-public class LoginHandler implements Route{
+public class LoginHandler implements Route {
 
     private final UserService userService = new UserService();
     private final Gson gson = new Gson();
