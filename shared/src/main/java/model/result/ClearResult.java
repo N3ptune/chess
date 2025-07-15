@@ -1,4 +1,4 @@
 package model.result;
 
-public class ClearResult {
+public record ClearResult() {
 }

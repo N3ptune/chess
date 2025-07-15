@@ -5,7 +5,7 @@ import model.request.JoinGameRequest;
 import model.request.CreateGameRequest;
 import model.result.CreateGameResult;
 import model.result.JoinGameResult;
-import model.result.ListGameResult;
+import model.result.ListGamesResult;
 
 
 // This will have Join Game, Create Game, and List Games
@@ -13,7 +13,7 @@ import model.result.ListGameResult;
 public class GameService {
     public JoinGameResult joinGame(JoinGameRequest joinGame){return new JoinGameResult();}
     public CreateGameResult createGame(CreateGameRequest createGame){return new CreateGameResult();}
-    public ListGameResult listGames(String authToken){
-        return new ListGameResult();
+    public ListGamesResult listGames(String authToken){
+        return new ListGamesResult();
     }
 }

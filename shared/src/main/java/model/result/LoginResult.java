@@ -1,4 +1,4 @@
 package model.result;
 
-public class LoginResult {
+public record LoginResult() {
 }
