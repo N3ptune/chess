@@ -20,24 +20,24 @@ public class UserService {
 
     public RegisterResult register(RegisterRequest registerRequest) {
         try{
-            if (registerRequest.getUsername() == null || registerRequest.getPassword() == null){
-                return new RegisterResult("Error: Username or Password empty");
+            if (registerRequest.username() == null || registerRequest.password() == null){
+                return new RegisterResult(null, null, "Error: Username or Password empty");
             }
 
-            UserData existing = dao.getUser(registerRequest.getUsername());
+            UserData existing = dao.getUser(registerRequest.username());
             if (existing != null){
-                return new RegisterResult("Error: username already taken");
+                return new RegisterResult(null, null, "Error: username already taken");
             }
 
-            UserData newUser = new UserData(registerRequest.getUsername(), registerRequest.getPassword(), registerRequest.getEmail());
+            UserData newUser = new UserData(registerRequest.username(), registerRequest.password(), registerRequest.email());
             dao.createUser(newUser);
 
-            String authToken = dao.createAuth(registerRequest.getUsername());
+            String authToken = dao.createAuth(registerRequest.username());
 
-            return new RegisterResult(registerRequest.getUsername(), authToken);
+            return new RegisterResult(registerRequest.username(), authToken, null);
 
         } catch (DataAccessException e){
-            return new RegisterResult("Error: " + e.getMessage());
+            return new RegisterResult(null, null, "Error: " + e.getMessage());
         }
     }
     public LoginResult login(LoginRequest loginRequest) {return new LoginResult();}
