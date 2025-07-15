@@ -86,4 +86,12 @@ public class MemoryDAO implements DataAccess{
         }
         games.put(gameID, game);
     }
+
+    @Override
+    public void deleteAuth(String authToken) throws DataAccessException {
+        if (!authTokens.containsKey(authToken)) {
+            throw new DataAccessException("Auth token not found");
+        }
+        authTokens.remove(authToken);
+    }
 }
