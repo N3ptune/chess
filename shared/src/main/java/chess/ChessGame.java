@@ -252,7 +252,7 @@ public class ChessGame {
     }
 
     public void undoMove(ChessMove move, ChessPiece capturedPiece, ChessPiece piece){
-        
+
         board.addPiece(move.getStartPosition(), piece);
         if (capturedPiece != null){
             board.addPiece(move.getEndPosition(), capturedPiece);
