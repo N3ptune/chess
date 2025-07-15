@@ -12,12 +12,10 @@ import model.request.ListGamesRequest;
 import model.result.CreateGameResult;
 import model.result.JoinGameResult;
 import model.result.ListGamesResult;
-import model.result.LogoutResult;
 
 import java.util.Collection;
 
 
-// This will have Join Game, Create Game, and List Games
 
 public class GameService {
 
@@ -71,11 +69,11 @@ public class GameService {
             return new CreateGameResult(-1, "Error: unauthourized");
         }
     }
-    public ListGamesResult listGames(String authToken){
+    public ListGamesResult listGames(ListGamesRequest listGames){
         try {
-            AuthData authData = dao.getAuth(authToken);
+            AuthData authData = dao.getAuth(listGames.authToken());
 
-            if (!authToken.equals(authData.authToken())){
+            if (!listGames.authToken().equals(authData.authToken())){
                 return new ListGamesResult(null, "Error: unauthorized");
             }
 
