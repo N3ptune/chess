@@ -8,10 +8,13 @@ import model.AuthData;
 import model.GameData;
 import model.request.JoinGameRequest;
 import model.request.CreateGameRequest;
+import model.request.ListGamesRequest;
 import model.result.CreateGameResult;
 import model.result.JoinGameResult;
 import model.result.ListGamesResult;
 import model.result.LogoutResult;
+
+import java.util.Collection;
 
 
 // This will have Join Game, Create Game, and List Games
@@ -69,6 +72,18 @@ public class GameService {
         }
     }
     public ListGamesResult listGames(String authToken){
-        return new ListGamesResult();
+        try {
+            AuthData authData = dao.getAuth(authToken);
+
+            if (!authToken.equals(authData.authToken())){
+                return new ListGamesResult(null, "Error: unauthorized");
+            }
+
+            Collection<GameData> games = dao.listGames();
+
+            return new ListGamesResult(games, null);
+        } catch (DataAccessException e){
+            return new ListGamesResult(null, "Error: " + e.getMessage());
+        }
     }
 }
