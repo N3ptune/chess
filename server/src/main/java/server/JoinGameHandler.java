@@ -20,11 +20,11 @@ public class JoinGameHandler implements Route {
         JoinGameResult joinGameResult = gameService.joinGame(joinGameRequest);
 
         if (joinGameResult.message() != null){
-            if (joinGameResult.message().toLowerCase().contains("request")){
+            if (joinGameResult.message().acontains("request")){
                 response.status(400);
-            } else if (joinGameResult.message().toLowerCase().contains("unauthorized")){
+            } else if (joinGameResult.message().contains("unauthorized")){
                 response.status(401);
-            }else if (joinGameResult.message().toLowerCase().contains("taken")){
+            }else if (joinGameResult.message().contains("taken")){
                 response.status(403);
             }else {
                 response.status(500);

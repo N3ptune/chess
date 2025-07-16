@@ -20,9 +20,9 @@ public class LoginHandler implements Route {
         LoginResult loginResult = userService.login(loginRequest);
 
         if (loginResult.message() != null){
-            if (loginResult.message().toLowerCase().contains("request")){
+            if (loginResult.message().contains("request")){
                 response.status(400);
-            } else if (loginResult.message().toLowerCase().contains("unauthorized")){
+            } else if (loginResult.message().contains("unauthorized")){
                 response.status(401);
             }else {
                 response.status(500);

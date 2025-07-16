@@ -15,11 +15,12 @@ public class LogoutHandler implements Route{
 
     @Override
     public Object handle(Request request, Response response) throws Exception {
-        LogoutRequest logoutRequest = gson.fromJson(request.body(), LogoutRequest.class);
+        String authToken = request.headers("Authorization");
+        LogoutRequest logoutRequest = new LogoutRequest(authToken);
         LogoutResult logoutResult = userService.logout(logoutRequest);
 
         if (logoutResult.message() != null){
-            if (logoutResult.message().toLowerCase().contains("unauthorized")){
+            if (logoutResult.message().contains("unauthorized")){
                 response.status(401);
             }else {
                 response.status(500);

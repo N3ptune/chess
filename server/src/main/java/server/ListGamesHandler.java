@@ -15,11 +15,12 @@ public class ListGamesHandler implements Route {
 
     @Override
     public Object handle(Request request, Response response) throws Exception {
-        ListGamesRequest listGamesRequest = gson.fromJson(request.body(), ListGamesRequest.class);
+        String authToken = request.headers("Authorization");
+        ListGamesRequest listGamesRequest = new ListGamesRequest(authToken);
         ListGamesResult listGamesResult = gameService.listGames(listGamesRequest);
 
         if (listGamesResult.message() != null){
-             if (listGamesResult.message().toLowerCase().contains("unauthorized")){
+             if (listGamesResult.message().contains("unauthorized")){
                 response.status(401);
             }else {
                 response.status(500);

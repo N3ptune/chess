@@ -22,9 +22,9 @@ public class CreateGameHandler implements Route {
         CreateGameResult createGameResult = gameService.createGame(createGameRequest);
 
         if (createGameResult.message() != null){
-            if (createGameResult.message().toLowerCase().contains("request")){
+            if (createGameResult.message().contains("request")){
                 response.status(400);
-            } else if (createGameResult.message().toLowerCase().contains("unauthorized")){
+            } else if (createGameResult.message().contains("unauthorized")){
                 response.status(401);
             } else {
                 response.status(500);
@@ -33,7 +33,7 @@ public class CreateGameHandler implements Route {
             response.status(200);
         }
 
-        return gson.toJson(createGameRequest);
+        return gson.toJson(createGameResult);
 
     }
 }

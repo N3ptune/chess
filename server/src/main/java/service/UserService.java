@@ -46,8 +46,13 @@ public class UserService {
             }
 
             UserData existing = dao.getUser(loginRequest.username());
+
+            if (existing == null){
+                return new LoginResult(null, null, "Error: user does not exist");
+            }
+
             if (!loginRequest.password().equals(existing.password())){
-                return new LoginResult(null, null, "Error: incorrect password");
+                return new LoginResult(null, null, "Error: unauthorized");
             }
 
             String authToken = dao.createAuth(loginRequest.username());

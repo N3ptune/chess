@@ -19,9 +19,9 @@ public class RegisterHandler implements Route{
         RegisterResult registerResult = userService.register(registerRequest);
 
         if (registerResult.message() != null){
-            if (registerResult.message().toLowerCase().contains("request")){
+            if (registerResult.message().contains("request")){
                 response.status(400);
-            } else if (registerResult.message().toLowerCase().contains("taken")){
+            } else if (registerResult.message().contains("taken")){
                 response.status(403);
             } else {
                 response.status(500);
