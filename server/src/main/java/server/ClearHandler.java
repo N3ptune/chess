@@ -4,7 +4,6 @@ package server;
 import model.request.ClearRequest;
 import model.result.ClearResult;
 import service.ClearService;
-import service.UserService;
 import spark.Request;
 import spark.Response;
 import spark.Route;

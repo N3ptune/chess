@@ -27,7 +27,9 @@ public class ListGamesHandler implements Route {
         if (listGamesResult.message() != null){
              if (listGamesResult.message().contains("unauthorized")){
                 response.status(401);
-            }else {
+            }else if (listGamesResult.message().contains("exist")){
+                 response.status(401);
+             }else {
                 response.status(500);
             }
         } else {
