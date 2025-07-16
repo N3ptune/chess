@@ -10,7 +10,11 @@ import com.google.gson.Gson;
 
 public class LogoutHandler implements Route{
 
-    private final UserService userService = new UserService();
+    private final UserService userService;
+
+    public LogoutHandler(UserService userService){
+        this.userService = userService;
+    }
     private final Gson gson = new Gson();
 
     @Override
@@ -21,6 +25,8 @@ public class LogoutHandler implements Route{
 
         if (logoutResult.message() != null){
             if (logoutResult.message().contains("unauthorized")){
+                response.status(401);
+            }else if (logoutResult.message().contains("exist")){
                 response.status(401);
             }else {
                 response.status(500);

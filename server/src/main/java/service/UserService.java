@@ -15,10 +15,13 @@ import model.result.LogoutResult;
 
 public class UserService {
 
-    private final DataAccess dao = new MemoryDAO();
+    private final DataAccess dao;
+
+    public UserService(DataAccess dao){
+        this.dao = dao;
+    }
 
     public RegisterResult register(RegisterRequest registerRequest) {
-        try{
             if (registerRequest.username() == null || registerRequest.password() == null){
                 return new RegisterResult(null, null, "Error: bad request");
             }
@@ -34,13 +37,9 @@ public class UserService {
             String authToken = dao.createAuth(registerRequest.username());
 
             return new RegisterResult(registerRequest.username(), authToken, null);
-
-        } catch (DataAccessException e){
-            return new RegisterResult(null, null, "Error: " + e.getMessage());
-        }
     }
     public LoginResult login(LoginRequest loginRequest) {
-        try{
+
             if (loginRequest.username() == null || loginRequest.password() == null){
                 return new LoginResult(null, null, "Error: bad request");
             }
@@ -51,6 +50,7 @@ public class UserService {
                 return new LoginResult(null, null, "Error: user does not exist");
             }
 
+
             if (!loginRequest.password().equals(existing.password())){
                 return new LoginResult(null, null, "Error: unauthorized");
             }
@@ -58,9 +58,7 @@ public class UserService {
             String authToken = dao.createAuth(loginRequest.username());
 
             return new LoginResult(loginRequest.username(), authToken, null);
-        } catch (DataAccessException e){
-            return new LoginResult(null, null, "Error: " + e.getMessage());
-        }
+
     }
     public LogoutResult logout(LogoutRequest logoutRequest) {
         try{

@@ -10,7 +10,7 @@ import java.util.Collection;
 public interface DataAccess {
     void clear();
     void createUser(UserData user);
-    UserData getUser(String username) throws DataAccessException;
+    UserData getUser(String username) ;
     String createAuth(String username);
     AuthData getAuth(String authToken) throws DataAccessException;
     int createGame(String gameName);

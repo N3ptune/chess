@@ -10,7 +10,12 @@ import com.google.gson.Gson;
 
 public class ListGamesHandler implements Route {
 
-    private final GameService gameService = new GameService();
+    private final GameService gameService;
+
+    public ListGamesHandler(GameService gameService){
+        this.gameService = gameService;
+    }
+
     private final Gson gson = new Gson();
 
     @Override

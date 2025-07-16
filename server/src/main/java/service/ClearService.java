@@ -8,7 +8,11 @@ import model.result.ClearResult;
 
 public class ClearService {
 
-    private final DataAccess dao = new MemoryDAO();
+    private final DataAccess dao;
+
+    public ClearService(DataAccess dao){
+        this.dao = dao;
+    }
 
     public ClearResult clear(ClearRequest clearRequest){
         dao.clear();

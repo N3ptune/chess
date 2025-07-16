@@ -11,7 +11,12 @@ import com.google.gson.Gson;
 
 public class LoginHandler implements Route {
 
-    private final UserService userService = new UserService();
+    private final UserService userService;
+
+    public LoginHandler(UserService userService){
+        this.userService = userService;
+    }
+
     private final Gson gson = new Gson();
 
     @Override
@@ -24,7 +29,9 @@ public class LoginHandler implements Route {
                 response.status(400);
             } else if (loginResult.message().contains("unauthorized")){
                 response.status(401);
-            }else {
+            }else if (loginResult.message().contains("exist")) {
+                response.status(401);
+            } else {
                 response.status(500);
             }
         } else {

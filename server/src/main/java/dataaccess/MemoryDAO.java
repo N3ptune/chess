@@ -28,10 +28,7 @@ public class MemoryDAO implements DataAccess{
     }
 
     @Override
-    public UserData getUser(String username) throws DataAccessException {
-        if (!users.containsKey(username)){
-            throw new DataAccessException("User does not exist");
-        }
+    public UserData getUser(String username)  {
         return users.get(username);
     }
 
@@ -44,7 +41,7 @@ public class MemoryDAO implements DataAccess{
     }
 
     @Override
-    public AuthData getAuth(String authToken) throws DataAccessException {
+    public AuthData getAuth(String authToken) throws DataAccessException{
         if (authTokens.get(authToken) == null){
             throw new DataAccessException("AuthData does not exist");
         }
@@ -79,12 +76,16 @@ public class MemoryDAO implements DataAccess{
         if (game == null){
             throw new DataAccessException("Game does not exist");
         }
+
+        GameData updatedGame;
+
         if (playerColor == ChessGame.TeamColor.WHITE) {
-            game = new GameData(game.gameID(), username, game.blackUsername(), game.gameName(), game.game());
-        } else if (playerColor == ChessGame.TeamColor.BLACK) {
-            game = new GameData(game.gameID(), game.whiteUsername(), username, game.gameName(), game.game());
+            updatedGame = new GameData(game.gameID(), username, game.blackUsername(), game.gameName(), game.game());
+        } else {
+            updatedGame = new GameData(game.gameID(), game.whiteUsername(), username, game.gameName(), game.game());
         }
-        games.put(gameID, game);
+
+        games.put(gameID, updatedGame);
     }
 
     @Override

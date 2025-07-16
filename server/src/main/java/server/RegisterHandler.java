@@ -2,6 +2,7 @@ package server;
 
 import model.request.RegisterRequest;
 import model.result.RegisterResult;
+import service.GameService;
 import service.UserService;
 import spark.Request;
 import spark.Response;
@@ -10,7 +11,12 @@ import com.google.gson.Gson;
 
 public class RegisterHandler implements Route{
 
-    private final UserService userService = new UserService();
+    private final UserService userService;
+
+    public RegisterHandler(UserService userService){
+        this.userService = userService;
+    }
+
     private final Gson gson = new Gson();
 
     @Override

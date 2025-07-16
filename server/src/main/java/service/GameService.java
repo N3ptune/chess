@@ -17,13 +17,27 @@ import java.util.Collection;
 
 
 
-public class GameService {
+public class GameService{
 
-    private final DataAccess dao = new MemoryDAO();
+    private final DataAccess dao;
+
+    public GameService(DataAccess dao){
+        this.dao = dao;
+    }
 
     public JoinGameResult joinGame(JoinGameRequest joinGame){
+
+        if (joinGame.authToken() == null){
+            return new JoinGameResult("Error: unauthorized");
+        }
+
         try {
             AuthData authData = dao.getAuth(joinGame.authToken());
+
+            if (authData == null){
+                return new JoinGameResult("Error: unauthorized");
+            }
+
             GameData game = dao.getGame(joinGame.gameID());
 
             if (!joinGame.authToken().equals(authData.authToken())){
@@ -51,12 +65,22 @@ public class GameService {
         }
     }
     public CreateGameResult createGame(CreateGameRequest createGame){
-        try {
 
-            AuthData authData = dao.getAuth(createGame.authToken());
 
-            if (!createGame.authToken().equals(authData.authToken())){
-                return new CreateGameResult(-1, "Error: unauthorized");
+            if (createGame.gameName() == null){
+                return new CreateGameResult(null, "Error: bad request");
+            }
+
+            AuthData authData;
+
+            try {
+                authData = dao.getAuth(createGame.authToken());
+            } catch(DataAccessException e){
+                return new CreateGameResult(null, "Error: " + e.getMessage());
+            }
+
+            if (!createGame.authToken().equals(authData.authToken())) {
+                return new CreateGameResult(null, "Error: unauthorized");
             }
 
             int gameID = dao.createGame(createGame.gameName());
@@ -65,15 +89,12 @@ public class GameService {
 
             return new CreateGameResult(gameID, null);
 
-        } catch (DataAccessException e){
-            return new CreateGameResult(-1, "Error: unauthourized");
-        }
     }
     public ListGamesResult listGames(ListGamesRequest listGames){
         try {
             AuthData authData = dao.getAuth(listGames.authToken());
 
-            if (!listGames.authToken().equals(authData.authToken())){
+            if (!listGames.authToken().equals(authData.authToken())) {
                 return new ListGamesResult(null, "Error: unauthorized");
             }
 
