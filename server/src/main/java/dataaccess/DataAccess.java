@@ -5,12 +5,13 @@ import model.AuthData;
 import model.GameData;
 import model.UserData;
 
+import java.sql.SQLException;
 import java.util.Collection;
 
 public interface DataAccess {
     void clear();
-    void createUser(UserData user);
-    UserData getUser(String username) ;
+    void createUser(UserData user) throws DataAccessException, SQLException;
+    UserData getUser(String username) throws DataAccessException;
     String createAuth(String username);
     AuthData getAuth(String authToken) throws DataAccessException;
     int createGame(String gameName);
