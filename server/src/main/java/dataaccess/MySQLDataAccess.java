@@ -4,12 +4,22 @@ import chess.ChessGame;
 import model.AuthData;
 import model.GameData;
 import model.UserData;
+import org.eclipse.jetty.client.HttpResponseException;
+import passoff.exception.ResponseParseException;
 
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.sql.Types;
 import java.util.Collection;
 import java.util.UUID;
 
 public class MySQLDataAccess implements DataAccess{
     private int nextGameID = 1;
+
+
+    public MySQLDataAccess throws HttpResponseException{
+        configureDatabase();
+    }
 
     @Override
     public void clear() {
@@ -90,5 +100,77 @@ public class MySQLDataAccess implements DataAccess{
             throw new DataAccessException("Auth token not found");
         }
         authTokens.remove(authToken);
+    }
+
+    private int executeUpdate(String statement, Object... params) throws DataAccessException {
+        try (var conn = DatabaseManager.getConnection()){
+            try (var preparedStatement = conn.prepareStatement(statement, Statement.RETURN_GENERATED_KEYS)) {
+                for (int i = 0; i < params.length; i++){
+                    Object param = params[i];
+                    if (param instanceof String s){
+                        preparedStatement.setString(i+1, s);
+                    } else if (param instanceof Integer x){
+                        preparedStatement.setInt(i + 1, x);
+                    } else if (param == null){
+                        preparedStatement.setNull(i+1, Types.NULL);
+                    } else {
+                        throw new DataAccessException(500, "Unsupported parameter type: " + param.getClass());
+                    }
+                }
+                preparedStatement.executeUpdate();
+
+                try (var rs = preparedStatement.getGeneratedKeys()) {
+                    if (rs.next()) {
+                        return rs.getInt(1);
+                    }
+                }
+
+                return 0;
+            } catch (SQLException e) {
+                throw new DataAccessException(500, "SQL error: " + e.getMessage());
+            }
+        }
+    }
+
+    private final String[] createStatements = {
+            """
+            CREATE TABLE IF NOT EXISTS games (
+            `id` INT PRIMARY KEY AUTO_INCREMENT,
+            `whiteUsername` varchar(256) NOT NULL,
+            `blackUsername` varchar(256) NOT NULL,
+            `gameName` varchar(256) NOT NULL,
+            FOREIGN KEY (`whiteUsername`) REFERENCES `users`(`username`)
+            FOREIGN KEY (`blackUsername`) REFERENCES `users`(`username`)
+            )
+            """,
+            """
+            CREATE TABLE IF NOT EXISTS users (
+            `username` varchar(256) NOT NULL,
+            `password` varchar(256) NOT NULL,
+            `email` varchar(256) NOT NULL
+            )
+            """,
+            """
+            CREATE TABLE IF NOT EXISTS auth (
+            `token` varchar(256) NOT NULL,
+            `username` varchar(256) NOT NULL
+            FOREIGN KEY (`username`) REFERENCES `users`(`username`)
+            )
+            """
+
+    };
+
+    private void configureDatabase() throws DataAccessException{
+        DatabaseManager.createDatabase();
+        try (var conn = DatabaseManager.getConnection();){
+            for (var statement : createStatements){
+                try (var preparedStatement : conn.prepareStatement(statement)) {
+                    preparedStatement.executeUpdate();
+                }
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException(500, String.format("Unable to configure database: %s", e.getMessage()));
+        }
+
     }
 }
