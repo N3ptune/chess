@@ -10,6 +10,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Types;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.UUID;
 
@@ -22,10 +23,14 @@ public class MySQLDataAccess implements DataAccess{
     }
 
     @Override
-    public void clear() {
-        authTokens.clear();
-        games.clear();
-        users.clear();
+    public void clear() throws SQLException, DataAccessException {
+        try {
+            executeUpdate("DELETE FROM auth");
+            executeUpdate("DELETE FROM games");
+            executeUpdate("DELETE FROM users");
+        } catch (Exception e){
+            throw new DataAccessException("Failed to clear database: " + e.getMessage());
+        }
     }
 
     @Override
@@ -37,7 +42,7 @@ public class MySQLDataAccess implements DataAccess{
     @Override
     public UserData getUser(String username) throws DataAccessException {
         try (var conn = DatabaseManager.getConnection()){
-            var statement = "SELECT id, json FROM user WHERE username =?";
+            var statement = "SELECT * FROM users WHERE username =?";
             try (var preparedStatment = conn.prepareStatement(statement)){
                 preparedStatment.setString(1, username);
                 try (var rs = preparedStatment.executeQuery()){
@@ -56,7 +61,7 @@ public class MySQLDataAccess implements DataAccess{
     public String createAuth(String username) throws DataAccessException, SQLException{
         String token = UUID.randomUUID().toString();
         AuthData authData = new AuthData(token, username);
-        String sqlInput = "INSERT INTO authTokens (token, username) VALUES (?,?)";
+        String sqlInput = "INSERT INTO auth (token, username) VALUES (?,?)";
         executeUpdate(sqlInput, token, username);
         return token;
     }
@@ -64,7 +69,7 @@ public class MySQLDataAccess implements DataAccess{
     @Override
     public AuthData getAuth(String authToken) throws DataAccessException{
         try (var conn = DatabaseManager.getConnection()){
-            var statement = "SELECT * FROM authTokens WHERE authToken = ?";
+            var statement = "SELECT * FROM auth WHERE authToken = ?";
             try (var preparedStatement = conn.prepareStatement(statement)){
                 preparedStatement.setString(1, authToken);
                 try (var rs = preparedStatement.executeQuery()) {
@@ -109,26 +114,61 @@ public class MySQLDataAccess implements DataAccess{
     }
 
     @Override
-    public Collection<GameData> listGames(){
-        return games.values();
+    public Collection<GameData> listGames() throws DataAccessException {
+        var games = new ArrayList<GameData>();
+        try (var conn = DatabaseManager.getConnection()){
+            var statement = "SELECT * FROM games";
+            try (var preparedStatement = conn.prepareStatement(statement)){
+                var rs = preparedStatement.executeQuery();
+                while (rs.next()){
+                    games.add(readGame(rs));
+                }
+            }
+        } catch (Exception e ){
+            throw new DataAccessException("Unable to read data: %s" + e.getMessage());
+        }
+        return games;
     }
 
     @Override
-    public void joinGame(int gameID, String username, ChessGame.TeamColor playerColor) throws DataAccessException {
-        GameData game = games.get(gameID);
-        if (game == null){
-            throw new DataAccessException("Game does not exist");
-        }
+    public void joinGame(int gameID, String username, ChessGame.TeamColor playerColor) throws DataAccessException, SQLException {
 
         GameData updatedGame;
 
-        if (playerColor == ChessGame.TeamColor.WHITE) {
-            updatedGame = new GameData(game.gameID(), username, game.blackUsername(), game.gameName(), game.game());
-        } else {
-            updatedGame = new GameData(game.gameID(), game.whiteUsername(), username, game.gameName(), game.game());
-        }
+        try (var conn = DatabaseManager.getConnection()){
+            String sqlSelect = "SELECT whiteUsername, blackUsername FROM games where gameID = ?";
+            try (var preparedStatement = conn.prepareStatement(sqlSelect)) {
+                preparedStatement.setInt(1, gameID);
+                try (var rs = preparedStatement.executeQuery()){
+                    if (!rs.next()){
+                        throw new DataAccessException("Game does not exist");
+                    }
 
-        games.put(gameID, updatedGame);
+                    String gameName = rs.getString("gameName");
+                    String game = rs.getString("game");
+                    String white = rs.getString("whiteUsername");
+                    String black = rs.getString("blackUsername");
+
+                    if (playerColor == ChessGame.TeamColor.WHITE){
+                        String sqlInput = "UPDATE games SET whiteUsername =? WHERE gameID = ?";
+                        try (var preparedStatement2 = conn.prepareStatement(sqlInput)){
+                            preparedStatement2.setString(1, username);
+                            preparedStatement2.setInt(2, gameID);
+                            preparedStatement2.executeUpdate();
+                        }
+                    } else if (playerColor == ChessGame.TeamColor.BLACK) {
+                        String sqlInput = "UPDATE games SET blackUsername =? WHERE gameID = ?";
+                        try (var preparedStatement2 = conn.prepareStatement(sqlInput)){
+                            preparedStatement2.setString(1, username);
+                            preparedStatement2.setInt(2, gameID);
+                            preparedStatement2.executeUpdate();
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            throw new DataAccessException("Unable to read data: %s" + e.getMessage());
+        }
     }
 
     @Override
@@ -181,7 +221,7 @@ public class MySQLDataAccess implements DataAccess{
         var whiteUsername = rs.getString("whiteUsername");
         var blackUsername = rs.getString("blackUsername");
         var gameName = rs.getString("gameName");
-        var json = rs.getString("json");
+        var json = rs.getString("game");
         var game = new Gson().fromJson(json, ChessGame.class);
         return new GameData(gameID, whiteUsername, blackUsername, gameName, game);
     }
@@ -199,6 +239,7 @@ public class MySQLDataAccess implements DataAccess{
             `whiteUsername` varchar(256) NOT NULL,
             `blackUsername` varchar(256) NOT NULL,
             `gameName` varchar(256) NOT NULL,
+            `game` varchar(256) NOT NULL,
             FOREIGN KEY (`whiteUsername`) REFERENCES `users`(`username`),
             FOREIGN KEY (`blackUsername`) REFERENCES `users`(`username`)
             )
