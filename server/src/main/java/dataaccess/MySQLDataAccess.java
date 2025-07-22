@@ -15,7 +15,6 @@ import java.util.Collection;
 import java.util.UUID;
 
 public class MySQLDataAccess implements DataAccess{
-    private int nextGameID = 1;
 
 
     public MySQLDataAccess() throws DataAccessException{
@@ -69,7 +68,7 @@ public class MySQLDataAccess implements DataAccess{
     @Override
     public AuthData getAuth(String authToken) throws DataAccessException{
         try (var conn = DatabaseManager.getConnection()){
-            var statement = "SELECT * FROM auth WHERE authToken = ?";
+            var statement = "SELECT * FROM auth WHERE token = ?";
             try (var preparedStatement = conn.prepareStatement(statement)){
                 preparedStatement.setString(1, authToken);
                 try (var rs = preparedStatement.executeQuery()) {
@@ -86,13 +85,11 @@ public class MySQLDataAccess implements DataAccess{
 
     @Override
     public int createGame(String gameName) throws SQLException, DataAccessException {
-        int gameID = nextGameID++;
         ChessGame newGame = new ChessGame();
-        GameData gameData = new GameData(gameID, null, null, gameName, newGame);
         String json = new Gson().toJson(newGame);
-        String sqlInput = "INSERT INTO games (gameID, whiteUsername, blackUsername, gameName, game) VALUES (?, ?, ?, ?, ?)";
-        executeUpdate(sqlInput, gameID, gameData.whiteUsername(), gameData.blackUsername(), gameName, json);
-        return gameID;
+        String sqlInput = "INSERT INTO games (whiteUsername, blackUsername, gameName, game) VALUES (?, ?, ?, ?, ?)";
+        executeUpdate(sqlInput, null, null, gameName, json);
+        return 1;
     }
 
     @Override
@@ -173,10 +170,12 @@ public class MySQLDataAccess implements DataAccess{
 
     @Override
     public void deleteAuth(String authToken) throws DataAccessException {
-        if (!authTokens.containsKey(authToken)) {
-            throw new DataAccessException("Auth token not found");
+
+        try {
+            executeUpdate("DELETE FROM auth WHERE token = ?", authToken);
+        } catch (Exception e){
+            throw new DataAccessException("Unable to delete auth: " + e.getMessage());
         }
-        authTokens.remove(authToken);
     }
 
     private int executeUpdate(String statement, Object... params) throws DataAccessException, SQLException {
@@ -236,8 +235,8 @@ public class MySQLDataAccess implements DataAccess{
             """
             CREATE TABLE IF NOT EXISTS games (
             `gameID` INT PRIMARY KEY AUTO_INCREMENT,
-            `whiteUsername` varchar(256) NOT NULL,
-            `blackUsername` varchar(256) NOT NULL,
+            `whiteUsername` varchar(256),
+            `blackUsername` varchar(256),
             `gameName` varchar(256) NOT NULL,
             `game` varchar(256) NOT NULL,
             FOREIGN KEY (`whiteUsername`) REFERENCES `users`(`username`),
@@ -246,14 +245,14 @@ public class MySQLDataAccess implements DataAccess{
             """,
             """
             CREATE TABLE IF NOT EXISTS users (
-            `username` varchar(256) NOT NULL,
+            `username` varchar(256) NOT NULL PRIMARY KEY,
             `password` varchar(256) NOT NULL,
             `email` varchar(256) NOT NULL
             )
             """,
             """
             CREATE TABLE IF NOT EXISTS auth (
-            `token` varchar(256) NOT NULL,
+            `token` varchar(256) NOT NULL PRIMARY KEY,
             `username` varchar(256) NOT NULL,
             FOREIGN KEY (`username`) REFERENCES `users`(`username`)
             )
