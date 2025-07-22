@@ -53,36 +53,59 @@ public class MySQLDataAccess implements DataAccess{
     }
 
     @Override
-    public String createAuth(String username){
+    public String createAuth(String username) throws DataAccessException, SQLException{
         String token = UUID.randomUUID().toString();
         AuthData authData = new AuthData(token, username);
-        authTokens.put(token, authData);
+        String sqlInput = "INSERT INTO authTokens (token, username) VALUES (?,?)";
+        executeUpdate(sqlInput, token, username);
         return token;
     }
 
     @Override
     public AuthData getAuth(String authToken) throws DataAccessException{
-        if (authTokens.get(authToken) == null){
-            throw new DataAccessException("AuthData does not exist");
+        try (var conn = DatabaseManager.getConnection()){
+            var statement = "SELECT * FROM authTokens WHERE authToken = ?";
+            try (var preparedStatement = conn.prepareStatement(statement)){
+                preparedStatement.setString(1, authToken);
+                try (var rs = preparedStatement.executeQuery()) {
+                    if (rs.next()) {
+                        return readAuth(rs);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            throw new DataAccessException("Unable to read data: %s" + e.getMessage());
         }
-        return authTokens.get(authToken);
+        return null;
     }
 
     @Override
-    public int createGame(String gameName){
+    public int createGame(String gameName) throws SQLException, DataAccessException {
         int gameID = nextGameID++;
         ChessGame newGame = new ChessGame();
         GameData gameData = new GameData(gameID, null, null, gameName, newGame);
-        games.put(gameID, gameData);
+        String json = new Gson().toJson(newGame);
+        String sqlInput = "INSERT INTO games (gameID, whiteUsername, blackUsername, gameName, game) VALUES (?, ?, ?, ?, ?)";
+        executeUpdate(sqlInput, gameID, gameData.whiteUsername(), gameData.blackUsername(), gameName, json);
         return gameID;
     }
 
     @Override
-    public GameData getGame(int gameID) throws DataAccessException {
-        if (games.get(gameID) == null){
-            throw new DataAccessException("Game does not exist");
+    public GameData getGame(int gameID) throws DataAccessException, SQLException {
+        try (var conn = DatabaseManager.getConnection()){
+            var statement = "SELECT * FROM games where gameID = ?";
+            try (var preparedStatement = conn.prepareStatement(statement)){
+                preparedStatement.setInt(1, gameID);
+                try (var rs = preparedStatement.executeQuery()){
+                    if (rs.next()){
+                        return readGame(rs);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            throw new DataAccessException("Unable to read data: %s" + e.getMessage());
         }
-        return games.get(gameID);
+        return null;
     }
 
     @Override
@@ -161,6 +184,12 @@ public class MySQLDataAccess implements DataAccess{
         var json = rs.getString("json");
         var game = new Gson().fromJson(json, ChessGame.class);
         return new GameData(gameID, whiteUsername, blackUsername, gameName, game);
+    }
+
+    private AuthData readAuth(ResultSet rs) throws SQLException {
+        var authToken = rs.getString("authToken");
+        var username = rs.getString("username");
+        return new AuthData(authToken, username);
     }
 
     private final String[] createStatements = {

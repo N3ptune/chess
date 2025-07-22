@@ -12,10 +12,10 @@ public interface DataAccess {
     void clear();
     void createUser(UserData user) throws DataAccessException, SQLException;
     UserData getUser(String username) throws DataAccessException;
-    String createAuth(String username);
+    String createAuth(String username) throws DataAccessException, SQLException;
     AuthData getAuth(String authToken) throws DataAccessException;
-    int createGame(String gameName);
-    GameData getGame(int gameID) throws DataAccessException;
+    int createGame(String gameName) throws SQLException, DataAccessException;
+    GameData getGame(int gameID) throws DataAccessException, SQLException;
     Collection<GameData> listGames();
     void joinGame(int gameID, String username, ChessGame.TeamColor playerColor) throws DataAccessException;
     void deleteAuth(String authToken) throws DataAccessException;
