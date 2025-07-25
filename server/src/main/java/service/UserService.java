@@ -10,6 +10,7 @@ import model.request.RegisterRequest;
 import model.result.LoginResult;
 import model.result.RegisterResult;
 import model.result.LogoutResult;
+import org.mindrot.jbcrypt.BCrypt;
 
 import java.sql.SQLException;
 
@@ -23,6 +24,9 @@ public class UserService {
     }
 
     public RegisterResult register(RegisterRequest registerRequest) {
+
+        String hashedPassword = BCrypt.hashpw(registerRequest.password(), BCrypt.gensalt());
+
             if (registerRequest.username() == null || registerRequest.password() == null){
                 return new RegisterResult(null, null, "Error: bad request");
             }
@@ -32,7 +36,7 @@ public class UserService {
                     return new RegisterResult(null, null, "Error: already taken");
                 }
 
-                UserData newUser = new UserData(registerRequest.username(), registerRequest.password(), registerRequest.email());
+                UserData newUser = new UserData(registerRequest.username(), hashedPassword, registerRequest.email());
                 dao.createUser(newUser);
 
                 String authToken = dao.createAuth(registerRequest.username());
@@ -55,7 +59,7 @@ public class UserService {
                 }
 
 
-                if (!loginRequest.password().equals(existing.password())) {
+                if (!BCrypt.checkpw(loginRequest.password(), existing.password())) {
                     return new LoginResult(null, null, "Error: unauthorized");
                 }
 
