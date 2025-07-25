@@ -39,7 +39,12 @@ public class GameService{
                 return new JoinGameResult("Error: unauthorized");
             }
 
+            if (joinGame.gameID() <= 0){
+                return new JoinGameResult("Error: bad request");
+            }
+
             GameData game = dao.getGame(joinGame.gameID());
+
 
             if (!joinGame.authToken().equals(authData.authToken())){
                 return new JoinGameResult("Error: unauthorized");
@@ -76,6 +81,10 @@ public class GameService{
 
             try {
                 authData = dao.getAuth(createGame.authToken());
+
+                if (authData == null) {
+                    return new CreateGameResult(null, "Error: unauthorized");
+                }
 
 
                 if (!createGame.authToken().equals(authData.authToken())) {
