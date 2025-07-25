@@ -1,4 +1,4 @@
-package service;
+package dataaccess;
 
 
 import chess.ChessGame;
@@ -8,8 +8,9 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import model.request.*;
 import model.result.*;
-import dataaccess.*;
-import server.ListGamesHandler;
+import service.ClearService;
+import service.GameService;
+import service.UserService;
 
 public class ServiceTests {
 
