@@ -24,6 +24,7 @@ public class MySQLDataAccess implements DataAccess{
     @Override
     public void clear() {
         try {
+
             executeUpdate("DELETE FROM auth");
             executeUpdate("DELETE FROM games");
             executeUpdate("DELETE FROM users");
