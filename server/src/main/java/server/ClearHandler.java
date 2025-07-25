@@ -20,20 +20,24 @@ public class ClearHandler implements Route{
 
     @Override
     public Object handle(Request request, Response response) throws Exception {
+        try {
 
+            ClearRequest clearRequest = new ClearRequest();
+            ClearResult clearResult = clearService.clear(clearRequest);
 
-        ClearRequest clearRequest = new ClearRequest();
-        ClearResult clearResult = clearService.clear(clearRequest);
-
-        if (clearResult.message() != null){
-            if (clearResult.message().contains("exist")){
-                response.status(401);
+            if (clearResult.message() != null) {
+                if (clearResult.message().contains("exist")) {
+                    response.status(401);
+                }
             }
+
+
+            response.status(200);
+
+            return gson.toJson(clearResult);
+        } catch (Exception e){
+            response.status(500);
+            return gson.toJson(new ClearResult("Error: " + e.getMessage()));
         }
-
-
-        response.status(200);
-
-        return gson.toJson(clearResult);
     }
 }
