@@ -22,13 +22,13 @@ public class MySQLDataAccess implements DataAccess{
     }
 
     @Override
-    public void clear() throws SQLException, DataAccessException {
+    public void clear() {
         try {
             executeUpdate("DELETE FROM auth");
             executeUpdate("DELETE FROM games");
             executeUpdate("DELETE FROM users");
         } catch (Exception e){
-            throw new DataAccessException("Failed to clear database: " + e.getMessage());
+            throw new RuntimeException("Error: " + e.getMessage());
         }
     }
 
@@ -87,9 +87,8 @@ public class MySQLDataAccess implements DataAccess{
     public int createGame(String gameName) throws SQLException, DataAccessException {
         ChessGame newGame = new ChessGame();
         String json = new Gson().toJson(newGame);
-        String sqlInput = "INSERT INTO games (whiteUsername, blackUsername, gameName, game) VALUES (?, ?, ?, ?, ?)";
-        executeUpdate(sqlInput, null, null, gameName, json);
-        return 1;
+        String sqlInput = "INSERT INTO games (whiteUsername, blackUsername, gameName, game) VALUES (?, ?, ?, ?)";
+        return executeUpdate(sqlInput, null, null, gameName, json);
     }
 
     @Override
@@ -172,7 +171,9 @@ public class MySQLDataAccess implements DataAccess{
     public void deleteAuth(String authToken) throws DataAccessException {
 
         try {
-            executeUpdate("DELETE FROM auth WHERE token = ?", authToken);
+            if (executeUpdate("DELETE FROM auth WHERE token = ?", authToken) == 0){
+                throw new DataAccessException("Auth token not found");
+            }
         } catch (Exception e){
             throw new DataAccessException("Unable to delete auth: " + e.getMessage());
         }
@@ -226,28 +227,28 @@ public class MySQLDataAccess implements DataAccess{
     }
 
     private AuthData readAuth(ResultSet rs) throws SQLException {
-        var authToken = rs.getString("authToken");
+        var authToken = rs.getString("token");
         var username = rs.getString("username");
         return new AuthData(authToken, username);
     }
 
     private final String[] createStatements = {
             """
+            CREATE TABLE IF NOT EXISTS users (
+            `username` varchar(256) NOT NULL PRIMARY KEY,
+            `password` varchar(256) NOT NULL,
+            `email` varchar(256) NOT NULL
+            )
+            """,
+            """
             CREATE TABLE IF NOT EXISTS games (
             `gameID` INT PRIMARY KEY AUTO_INCREMENT,
             `whiteUsername` varchar(256),
             `blackUsername` varchar(256),
             `gameName` varchar(256) NOT NULL,
-            `game` varchar(256) NOT NULL,
+            `game` TEXT NOT NULL,
             FOREIGN KEY (`whiteUsername`) REFERENCES `users`(`username`),
             FOREIGN KEY (`blackUsername`) REFERENCES `users`(`username`)
-            )
-            """,
-            """
-            CREATE TABLE IF NOT EXISTS users (
-            `username` varchar(256) NOT NULL PRIMARY KEY,
-            `password` varchar(256) NOT NULL,
-            `email` varchar(256) NOT NULL
             )
             """,
             """

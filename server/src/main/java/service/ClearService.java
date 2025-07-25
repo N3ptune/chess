@@ -1,9 +1,11 @@
 package service;
 
 import dataaccess.DataAccess;
-import dataaccess.MemoryDAO;
+import dataaccess.DataAccessException;
 import model.request.ClearRequest;
 import model.result.ClearResult;
+
+import java.sql.SQLException;
 
 
 public class ClearService {
@@ -14,8 +16,12 @@ public class ClearService {
         this.dao = dao;
     }
 
-    public ClearResult clear(ClearRequest clearRequest){
-        dao.clear();
-        return new ClearResult(null);
+    public ClearResult clear(ClearRequest clearRequest) {
+        try{
+            dao.clear();
+            return new ClearResult(null);
+        } catch (DataAccessException | SQLException e) {
+            return new ClearResult("Error: " + e.getMessage());
+        }
     }
 }

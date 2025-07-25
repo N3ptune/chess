@@ -32,7 +32,7 @@ public class ServiceTests {
 
         @Test
         @DisplayName("If clear when full then success")
-        public void clearWhenFull(){
+        public void clearWhenFull() {
             RegisterRequest registerRequest = new RegisterRequest("userName", "passWord", "email@test.com");
             RegisterResult registerResult = userService.register(registerRequest);
             Assertions.assertNotNull(registerResult.authToken());
@@ -46,7 +46,7 @@ public class ServiceTests {
 
         @Test
         @DisplayName("If clear when empty then success")
-        public void clearWhenEmpty(){
+        public void clearWhenEmpty() {
             ClearResult clearResult = clearService.clear(new ClearRequest());
             Assertions.assertNull(clearResult.message());
         }

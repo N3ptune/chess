@@ -1,7 +1,9 @@
 package server;
 
 import dataaccess.DataAccess;
+import dataaccess.DataAccessException;
 import dataaccess.MemoryDAO;
+import dataaccess.MySQLDataAccess;
 import service.ClearService;
 import service.GameService;
 import service.UserService;
@@ -14,7 +16,12 @@ public class Server {
 
         Spark.staticFiles.location("web");
 
-        DataAccess dao = new MemoryDAO();
+        DataAccess dao;
+        try {
+            dao = new MySQLDataAccess();
+        } catch (DataAccessException e) {
+            return -1;
+        }
 
         UserService userService = new UserService(dao);
         GameService gameService = new GameService(dao);

@@ -3,7 +3,6 @@ package service;
 import chess.ChessGame;
 import dataaccess.DataAccess;
 import dataaccess.DataAccessException;
-import dataaccess.MemoryDAO;
 import model.AuthData;
 import model.GameData;
 import model.request.JoinGameRequest;
@@ -13,6 +12,7 @@ import model.result.CreateGameResult;
 import model.result.JoinGameResult;
 import model.result.ListGamesResult;
 
+import java.sql.SQLException;
 import java.util.Collection;
 
 
@@ -60,7 +60,7 @@ public class GameService{
 
             return new JoinGameResult(null);
 
-        } catch (DataAccessException e){
+        } catch (DataAccessException | SQLException e){
             return new JoinGameResult("Error: " + e.getMessage());
         }
     }
@@ -75,19 +75,19 @@ public class GameService{
 
             try {
                 authData = dao.getAuth(createGame.authToken());
-            } catch(DataAccessException e){
+
+
+                if (!createGame.authToken().equals(authData.authToken())) {
+                    return new CreateGameResult(null, "Error: unauthorized");
+                }
+
+                int gameID = dao.createGame(createGame.gameName());
+
+                return new CreateGameResult(gameID, null);
+
+            } catch(DataAccessException | SQLException e) {
                 return new CreateGameResult(null, "Error: " + e.getMessage());
             }
-
-            if (!createGame.authToken().equals(authData.authToken())) {
-                return new CreateGameResult(null, "Error: unauthorized");
-            }
-
-            int gameID = dao.createGame(createGame.gameName());
-
-            GameData game = new GameData(gameID, null, null, createGame.gameName(), new ChessGame());
-
-            return new CreateGameResult(gameID, null);
 
     }
     public ListGamesResult listGames(ListGamesRequest listGames){
