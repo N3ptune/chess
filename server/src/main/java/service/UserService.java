@@ -72,6 +72,10 @@ public class UserService {
 
             AuthData authData = dao.getAuth(logoutRequest.authToken());
 
+            if (authData == null) {
+                return new LogoutResult("Error: unauthorized");
+            }
+
             if (!logoutRequest.authToken().equals(authData.authToken())){
                 return new LogoutResult("Error: unauthorized");
             }

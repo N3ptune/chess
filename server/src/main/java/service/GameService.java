@@ -11,6 +11,7 @@ import model.request.ListGamesRequest;
 import model.result.CreateGameResult;
 import model.result.JoinGameResult;
 import model.result.ListGamesResult;
+import model.result.LogoutResult;
 
 import java.sql.SQLException;
 import java.util.Collection;
@@ -93,6 +94,10 @@ public class GameService{
     public ListGamesResult listGames(ListGamesRequest listGames){
         try {
             AuthData authData = dao.getAuth(listGames.authToken());
+
+            if (authData == null) {
+                return new ListGamesResult(null, "Error: unauthorized");
+            }
 
             if (!listGames.authToken().equals(authData.authToken())) {
                 return new ListGamesResult(null, "Error: unauthorized");

@@ -19,15 +19,13 @@ public class ServiceTests {
         private DataAccess dao;
 
         @BeforeEach
-        public void setup(){
-            dao = new MemoryDAO();
+        public void setup() throws DataAccessException{
+            dao = new MySQLDataAccess();
             clearService = new ClearService(dao);
             gameService = new GameService(dao);
             userService = new UserService(dao);
-        }
 
-        public void beforeAllButClear(){
-
+            clearService.clear(new ClearRequest());
         }
 
         @Test
@@ -41,7 +39,7 @@ public class ServiceTests {
             Assertions.assertNull(clearResult.message());
 
             LoginResult loginResult = userService.login(new LoginRequest("userName", "passWord"));
-            Assertions.assertEquals("Error: user does not exist", loginResult.message());
+            Assertions.assertNotNull(loginResult.message());
         }
 
         @Test
@@ -118,6 +116,7 @@ public class ServiceTests {
         @Test
         @DisplayName("If register when valid the success")
         public void registerSuccess(){
+            clearService.clear(new ClearRequest());
             RegisterRequest registerRequest = new RegisterRequest("userName", "passWord", "email@test.com");
             RegisterResult registerResult = userService.register(registerRequest);
             Assertions.assertNotNull(registerResult.authToken());

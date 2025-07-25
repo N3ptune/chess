@@ -129,8 +129,6 @@ public class MySQLDataAccess implements DataAccess{
     @Override
     public void joinGame(int gameID, String username, ChessGame.TeamColor playerColor) throws DataAccessException, SQLException {
 
-        GameData updatedGame;
-
         try (var conn = DatabaseManager.getConnection()){
             String sqlSelect = "SELECT whiteUsername, blackUsername FROM games where gameID = ?";
             try (var preparedStatement = conn.prepareStatement(sqlSelect)) {
@@ -139,11 +137,6 @@ public class MySQLDataAccess implements DataAccess{
                     if (!rs.next()){
                         throw new DataAccessException("Game does not exist");
                     }
-
-                    String gameName = rs.getString("gameName");
-                    String game = rs.getString("game");
-                    String white = rs.getString("whiteUsername");
-                    String black = rs.getString("blackUsername");
 
                     if (playerColor == ChessGame.TeamColor.WHITE){
                         String sqlInput = "UPDATE games SET whiteUsername =? WHERE gameID = ?";
@@ -171,7 +164,7 @@ public class MySQLDataAccess implements DataAccess{
     public void deleteAuth(String authToken) throws DataAccessException {
 
         try {
-            if (executeUpdate("DELETE FROM auth WHERE token = ?", authToken) == 0){
+            if (executeUpdate("DELETE FROM auth WHERE token = ?", authToken) != 0){
                 throw new DataAccessException("Auth token not found");
             }
         } catch (Exception e){
