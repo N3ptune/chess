@@ -4,6 +4,7 @@ import state.ClientState;
 import ui.PostloginUI;
 import ui.PreloginUI;
 
+import java.util.Arrays;
 import java.util.Scanner;
 
 public class Main {
@@ -23,10 +24,21 @@ public class Main {
         System.out.println("Chess >>> ");
 
         while (true){
+
+            String line = scanner.nextLine().trim();
+
+            if (line.isEmpty()){
+                continue;
+            }
+
+            String [] parts = line.split("\\s+");
+            String command = parts[0].toLowerCase();
+            String[] commandArgs = Arrays.copyOfRange(parts, 1, parts.length);
+
             if (!state.isLoggedIn()){
-                PreloginUI.handleCommand(scanner.nextLine().trim().toLowerCase(), state, facade);
+                PreloginUI.handleCommand(command, commandArgs, state, facade);
             } else {
-                PostloginUI.handleCommand(scanner.nextLine().trim().toLowerCase(), state, facade);
+                PostloginUI.handleCommand(command, commandArgs, state, facade);
             }
         }
     }
