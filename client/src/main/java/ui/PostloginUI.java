@@ -80,6 +80,7 @@ public class PostloginUI {
 
         if (args.length < 3){
             System.out.println("Please make sure to include <GAME ID> <USERNAME> <DESIRED COLOR>");
+            return;
         }
 
         String authToken = state.getAuthToken();
@@ -105,5 +106,21 @@ public class PostloginUI {
 
     private static void doObserve(String[] args, ClientState state, ServerFacade facade){
 
+        if (args.length < 2){
+            System.out.println("Please make sure to include <GAME ID> <USERNAME>");
+            return;
+        }
+
+        String authToken = state.getAuthToken();
+        Integer gameID = Integer.parseInt(args[0]);
+        String username = args[1];
+        ChessGame.TeamColor playerColor = null;
+
+        try {
+            facade.joinGame(gameID, username, playerColor, authToken);
+            state.joinGame(gameID, authToken);
+        } catch (Exception e){
+            System.out.println("Error joining as an observer, please try again shortly");
+        }
     }
 }
