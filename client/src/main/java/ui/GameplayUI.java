@@ -25,8 +25,6 @@ public class GameplayUI {
 
     public static void writeBoard(ChessGame.TeamColor perspective, ClientState state, ServerFacade facade){
 
-        ChessGame.TeamColor playerColor = state.getPlayerColor();
-
         ChessGame game = new ChessGame();
         ChessBoard board = game.getBoard();
 

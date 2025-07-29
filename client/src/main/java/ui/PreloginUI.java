@@ -4,8 +4,6 @@ import facade.ServerFacade;
 import model.AuthData;
 import state.ClientState;
 
-import java.util.Scanner;
-
 public class PreloginUI {
 
     public static void handleCommand(String command, String[] commandArgs, ClientState state, ServerFacade facade){
