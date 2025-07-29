@@ -30,11 +30,9 @@ public class GameplayUI {
         ChessGame game = new ChessGame();
         ChessBoard board = game.getBoard();
 
-        if (playerColor == ChessGame.TeamColor.WHITE || state.getPlayerColor() == null){
-            //WRITE the board as if white
             System.out.print(EscapeSequences.ERASE_SCREEN);
             int startRow = (perspective == ChessGame.TeamColor.WHITE) ? 8 : 1;
-            int endRow = (perspective == ChessGame.TeamColor.WHITE) ? 1 : 8;
+            int endRow = (perspective == ChessGame.TeamColor.WHITE) ? 0 : 9;
             int step = (perspective == ChessGame.TeamColor.WHITE) ? -1 : 1;
 
             char[] columns = (perspective == ChessGame.TeamColor.WHITE)
@@ -43,7 +41,7 @@ public class GameplayUI {
 
             System.out.print("   ");
             for (char col : columns){
-                System.out.print(" " + col + " ");
+                System.out.print(col + "   ");
             }
             System.out.println();
 
@@ -61,8 +59,8 @@ public class GameplayUI {
                     } else {
                         String symbol = getUnicodePiece(piece);
                         String color = (piece.getTeamColor() == ChessGame.TeamColor.WHITE)
-                                ? EscapeSequences.SET_TEXT_COLOR_BLACK
-                                : EscapeSequences.SET_TEXT_COLOR_WHITE;
+                                ? EscapeSequences.SET_TEXT_COLOR_WHITE
+                                : EscapeSequences.SET_TEXT_COLOR_BLACK;
                         System.out.print(color + symbol);
                     }
                     System.out.print(EscapeSequences.RESET_BG_COLOR + EscapeSequences.RESET_TEXT_COLOR);
@@ -71,11 +69,11 @@ public class GameplayUI {
             }
             System.out.print("   ");
             for (char col : columns) {
-                System.out.print(" " + col + " ");
+                System.out.print(col + "   ");
             }
             System.out.println();
         }
-    }
+
 
     private static String getUnicodePiece(ChessPiece piece) {
         return switch (piece.getPieceType()) {

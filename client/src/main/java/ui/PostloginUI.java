@@ -6,6 +6,7 @@ import model.AuthData;
 import model.GameData;
 import state.ClientState;
 
+import java.util.Collection;
 import java.util.List;
 
 public class PostloginUI {
@@ -36,6 +37,7 @@ public class PostloginUI {
             String authToken = state.getAuthToken();
             facade.logout(authToken);
             state.logout();
+            System.out.println("Logged out succesfully");
         } catch (Exception e){
             System.out.println("Error logging out, please try again shortly");
         }
@@ -62,7 +64,10 @@ public class PostloginUI {
         String authToken = state.getAuthToken();
 
         try {
-            List<GameData> games = facade.listGames(authToken);
+            List<GameData> games = facade.listGames(authToken).stream().toList();
+            if (games.size() == 0 || games == null){
+                System.out.println("No games to show");
+            }
             for (int i = 0; i < games.size(); i++){
                 GameData game = games.get(i);
                 Integer gameID = game.gameID();
@@ -72,7 +77,7 @@ public class PostloginUI {
                 System.out.println(gameID + ".   Game name: " + gameName + "   White: " + white + "   Black: " + black);
             }
         } catch (Exception e){
-            System.out.println("Error listing games, please try again shortly");
+            System.out.println("Error listing games, please try again shortly " + e.getMessage());
         }
     }
 
@@ -88,17 +93,19 @@ public class PostloginUI {
         String username = args[1];
         ChessGame.TeamColor playerColor = null;
 
-        if (args[2].toLowerCase() == "white"){
+        if (args[2].toLowerCase().equals("white")){
             playerColor = ChessGame.TeamColor.WHITE;
-        } else if (args[2].toLowerCase() == "black"){
+        } else if (args[2].toLowerCase().equals("black")){
             playerColor = ChessGame.TeamColor.BLACK;
         } else {
-            System.out.println("Please provide a valid team color to join as");
+            System.out.println("Please provide a valid team color to join as, not " + args[2]);
+            return;
         }
 
         try {
             facade.joinGame(gameID, username, playerColor, authToken);
             state.joinGame(gameID, playerColor);
+            System.out.println("Joined game as " + playerColor);
         } catch (Exception e){
             System.out.println("Error joining game, please try again shortly");
         }
@@ -117,8 +124,7 @@ public class PostloginUI {
         ChessGame.TeamColor playerColor = null;
 
         try {
-            facade.joinGame(gameID, username, playerColor, authToken);
-            state.joinGame(gameID, playerColor);
+            // Confirm the game exists, go to gameplayUI
         } catch (Exception e){
             System.out.println("Error joining as an observer, please try again shortly");
         }

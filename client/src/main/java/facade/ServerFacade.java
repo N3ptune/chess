@@ -12,6 +12,7 @@ import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
+import java.util.Collection;
 import java.util.List;
 
 public class ServerFacade {
@@ -24,45 +25,50 @@ public class ServerFacade {
 
     public AuthData login(String username, String password){
         LoginRequest loginRequest = new LoginRequest(username, password);
-        var result = makeRequest("POST", "session/login", loginRequest, AuthData.class);
+        var result = makeRequest("POST", "/session", loginRequest, AuthData.class, null);
         return result;
     }
 
     public AuthData register(String username, String password, String email){
         RegisterRequest registerRequest = new RegisterRequest(username, password, email);
-        var result = makeRequest("POST", "user/register", registerRequest, AuthData.class);
+        var result = makeRequest("POST", "/user", registerRequest, AuthData.class, null);
         return result;
     }
 
     public void logout(String authToken){
         LogoutRequest logoutRequest = new LogoutRequest(authToken);
-        makeRequest("DELETE", "session/logout", logoutRequest, null);
+        makeRequest("DELETE", "/session", logoutRequest, null, authToken);
     }
 
     public Integer createGame(String gameName, String authToken){
         CreateGameRequest createGameRequest = new CreateGameRequest(authToken, gameName);
-        var result = makeRequest("POST", "/game/createGame", createGameRequest, Integer.class);
+        var result = makeRequest("POST", "/game", createGameRequest, Integer.class, authToken);
         return result;
     }
 
-    public List<GameData> listGames(String authToken){
+    public Collection<GameData> listGames(String authToken){
         ListGamesRequest listGamesRequest = new ListGamesRequest(authToken);
-        var result = makeRequest("GET", "/game/listGames", listGamesRequest, List.class);
-        return result;
+
+        var result = makeRequest("GET", "/game", null, ListGamesResult.class, authToken);
+        return result.games();
     }
 
     public void joinGame(Integer gameID, String username, ChessGame.TeamColor playerColor, String authToken){
         JoinGameRequest joinGameRequest = new JoinGameRequest(authToken, playerColor, gameID);
-        makeRequest("PUT", "/game/joinGame", joinGameRequest, null);
+        makeRequest("PUT", "/game", joinGameRequest, null, authToken);
     }
 
-    private <T>T makeRequest(String method, String path, Object request, Class<T> responseClass){
+    private <T>T makeRequest(String method, String path, Object request, Class<T> responseClass, String authToken){
         try {
             URL url = (new URI(serverUrl + path)).toURL();
             HttpURLConnection http = (HttpURLConnection) url.openConnection();
             http.setRequestMethod(method);
             http.setDoOutput(true);
 
+
+            if (authToken != null){
+                http.addRequestProperty("Authorization", authToken);
+            }
             writeBody(request, http);
             http.connect();
             return readBody(http, responseClass);
