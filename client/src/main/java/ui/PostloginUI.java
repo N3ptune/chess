@@ -62,7 +62,7 @@ public class PostloginUI {
         String authToken = state.getAuthToken();
 
         try {
-            List<GameData> games = facade.listGames();
+            List<GameData> games = facade.listGames(authToken);
             for (int i = 0; i < games.size(); i++){
                 GameData game = games.get(i);
                 Integer gameID = game.gameID();
@@ -86,7 +86,7 @@ public class PostloginUI {
         String authToken = state.getAuthToken();
         Integer gameID = Integer.parseInt(args[0]);
         String username = args[1];
-        ChessGame.TeamColor playerColor;
+        ChessGame.TeamColor playerColor = null;
 
         if (args[2].toLowerCase() == "white"){
             playerColor = ChessGame.TeamColor.WHITE;
@@ -118,7 +118,7 @@ public class PostloginUI {
 
         try {
             facade.joinGame(gameID, username, playerColor, authToken);
-            state.joinGame(gameID, authToken);
+            state.joinGame(gameID, playerColor);
         } catch (Exception e){
             System.out.println("Error joining as an observer, please try again shortly");
         }

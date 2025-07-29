@@ -27,9 +27,10 @@ public class GameplayUI {
 
         ChessGame.TeamColor playerColor = state.getPlayerColor();
 
-        ChessBoard board = new ChessBoard();
+        ChessGame game = new ChessGame();
+        ChessBoard board = game.getBoard();
 
-        if (playerColor == ChessGame.TeamColor.WHITE || state.getPlayerColor == null){
+        if (playerColor == ChessGame.TeamColor.WHITE || state.getPlayerColor() == null){
             //WRITE the board as if white
             System.out.print(EscapeSequences.ERASE_SCREEN);
             int startRow = (perspective == ChessGame.TeamColor.WHITE) ? 8 : 1;

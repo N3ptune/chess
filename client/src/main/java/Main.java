@@ -1,6 +1,7 @@
 import chess.*;
 import facade.ServerFacade;
 import state.ClientState;
+import ui.GameplayUI;
 import ui.PostloginUI;
 import ui.PreloginUI;
 
@@ -14,16 +15,18 @@ public class Main {
     private static ServerFacade facade;
 
     public static void main(String[] args) {
-        facade = new ServerFacade();
+        facade = new ServerFacade("http://localhost:8080/");
         System.out.println("♕ Welcome to Chess! Sign in to start. ♕");
         System.out.println("Options: ");
         System.out.println("Login as an existing user: \"l\", \"login\" <USERNAME> <PASSWORD>");
         System.out.println("Register as a new user: \"r\", \"register\" <USERNAME> <PASSWORD> <EMAIL>");
         System.out.println("Exit the program \"q\", \"quit\"");
         System.out.println("Print this message: \"h\", \"help\"");
-        System.out.println("Chess >>> ");
+
 
         while (true){
+
+            System.out.println("Chess >>> ");
 
             String line = scanner.nextLine().trim();
 
@@ -37,6 +40,8 @@ public class Main {
 
             if (!state.isLoggedIn()){
                 PreloginUI.handleCommand(command, commandArgs, state, facade);
+            } else if (state.isInGame()){
+                GameplayUI.handleCommand(command, commandArgs, state, facade);
             } else {
                 PostloginUI.handleCommand(command, commandArgs, state, facade);
             }

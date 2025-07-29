@@ -37,7 +37,7 @@ public class PreloginUI {
         String email = args[2];
 
         try {
-            var authData = facade.register(username, password, email);
+            AuthData authData = facade.register(username, password, email);
             state.login(authData, username);
         } catch (Exception e) {
             System.out.println("Registration unsuccesful. Please try again shortly.");
