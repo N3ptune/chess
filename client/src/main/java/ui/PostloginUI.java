@@ -2,11 +2,8 @@ package ui;
 
 import chess.ChessGame;
 import facade.ServerFacade;
-import model.AuthData;
 import model.GameData;
 import state.ClientState;
-
-import java.util.Collection;
 import java.util.List;
 
 public class PostloginUI {
