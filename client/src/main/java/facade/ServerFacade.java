@@ -5,15 +5,14 @@ import com.google.gson.Gson;
 import model.AuthData;
 import model.GameData;
 import model.request.*;
+import model.result.CreateGameResult;
 import model.result.ListGamesResult;
-import model.result.LogoutResult;
 
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
 import java.util.Collection;
-import java.util.List;
 
 public class ServerFacade {
 
@@ -42,8 +41,8 @@ public class ServerFacade {
 
     public Integer createGame(String gameName, String authToken){
         CreateGameRequest createGameRequest = new CreateGameRequest(authToken, gameName);
-        var result = makeRequest("POST", "/game", createGameRequest, Integer.class, authToken);
-        return result;
+        var result = makeRequest("POST", "/game", createGameRequest, CreateGameResult.class, authToken);
+        return result.gameID();
     }
 
     public Collection<GameData> listGames(String authToken){
@@ -58,7 +57,7 @@ public class ServerFacade {
         makeRequest("PUT", "/game", joinGameRequest, null, authToken);
     }
 
-    private <T>T makeRequest(String method, String path, Object request, Class<T> responseClass, String authToken){
+    public <T>T makeRequest(String method, String path, Object request, Class<T> responseClass, String authToken){
         try {
             URL url = (new URI(serverUrl + path)).toURL();
             HttpURLConnection http = (HttpURLConnection) url.openConnection();
@@ -69,8 +68,13 @@ public class ServerFacade {
             if (authToken != null){
                 http.addRequestProperty("Authorization", authToken);
             }
-            writeBody(request, http);
+
+            if ( request != null && (method.equals("POST") || method.equals("PUT"))){
+                writeBody(request, http);
+            }
+
             http.connect();
+
             return readBody(http, responseClass);
         } catch (Exception e){
             return null;
