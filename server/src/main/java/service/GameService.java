@@ -58,7 +58,9 @@ public class GameService{
                 if (game.blackUsername() != null) {
                     return new JoinGameResult("Error: color already taken");
                 }
-            } else {
+            } else if (joinGame.playerColor() == null){
+                dao.joinGame(game.gameID(), authData.username(), null);
+            }else {
                 return new JoinGameResult("Error: not a valid color");
             }
 
@@ -70,6 +72,7 @@ public class GameService{
             return new JoinGameResult("Error: " + e.getMessage());
         }
     }
+
     public CreateGameResult createGame(CreateGameRequest createGame){
 
 
