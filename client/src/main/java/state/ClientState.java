@@ -11,7 +11,8 @@ public class ClientState {
     private ChessGame.TeamColor playerColor;
 
     public void login(AuthData authData, String username){
-
+        this.authToken = authData.authToken();
+        this.username = username;
     }
 
     public String getAuthToken(){

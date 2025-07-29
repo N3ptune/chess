@@ -36,12 +36,12 @@ public class Server {
         ClearHandler clearHandler = new ClearHandler(clearService);
 
         // Register your endpoints and handle exceptions here.
-        Spark.post("/user", registerHandler);
-        Spark.post("/session", loginHandler);
-        Spark.delete("/session", logoutHandler);
-        Spark.get("/game", listGamesHandler);
-        Spark.post("/game", createGameHandler);
-        Spark.put("/game", joinGameHandler);
+        Spark.post("/user/register", registerHandler);
+        Spark.post("/session/login", loginHandler);
+        Spark.delete("/session/logout", logoutHandler);
+        Spark.get("/game/listGames", listGamesHandler);
+        Spark.post("/game/createGame", createGameHandler);
+        Spark.put("/game/joinGame", joinGameHandler);
         Spark.delete("/db", clearHandler);
 
         //This line initializes the server and can be removed once you have a functioning endpoint 
