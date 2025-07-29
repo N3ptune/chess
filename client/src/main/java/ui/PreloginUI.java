@@ -1,6 +1,7 @@
 package ui;
 
 import facade.ServerFacade;
+import model.AuthData;
 import state.ClientState;
 
 import java.util.Scanner;
@@ -11,10 +12,8 @@ public class PreloginUI {
         switch (command) {
             case "help" -> showHelp();
             case "register" -> doRegister(commandArgs, state, facade);
-            case "login" -> doLogin();
+            case "login" -> doLogin(commandArgs, state, facade);
             case "quit" -> {
-                doLogout();
-                System.out.println("You are logged out.");
                 System.exit(0);
             }
             default -> System.out.println("Command not recognized. Please try again or type \"help\" for a list of available commands.");
@@ -40,10 +39,26 @@ public class PreloginUI {
         try {
             var authData = facade.register(username, password, email);
             state.login(authData, username);
+        } catch (Exception e) {
+            System.out.println("Registration unsuccesful. Please try again shortly.");
         }
     }
 
-    private static void doLogin(){}
+    private static void doLogin(String[] args, ClientState state, ServerFacade facade){
+        if (args.length < 2) {
+            System.out.println("Please make sure to include <USERNAME> <PASSWORD> ");
+            return;
+        }
 
-    private static void doLogout(){}
+        String username = args[0];
+        String password = args[1];
+
+        try {
+            AuthData authData = facade.login(username, password);
+            state.login(authData, username);
+            System.out.println("Successfully logged in.");
+        } catch (Exception e){
+            System.out.println("Username or password incorrect");
+        }
+    }
 }
