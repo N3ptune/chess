@@ -3,6 +3,7 @@ package ui;
 import chess.ChessGame;
 import facade.ServerFacade;
 import model.GameData;
+import model.result.ListGamesResult;
 import state.ClientState;
 import java.util.List;
 
@@ -26,6 +27,7 @@ public class PostloginUI {
         System.out.println("List all active games: \"li\", \"list\"");
         System.out.println("Join an active game: \"j\", \"join\" <GAME ID> <USERNAME> <DESIRED COLOR>");
         System.out.println("Observe an active game: \"o\", \"observe\" <GAME ID> <USERNAME>");
+        System.out.println("See all commands \"help\"");
         System.out.println("Chess >>> ");
     }
 
@@ -65,13 +67,16 @@ public class PostloginUI {
             if (games.size() == 0 || games == null){
                 System.out.println("No games to show");
             }
+
+            state.setLastListedGames(games);
+
             for (int i = 0; i < games.size(); i++){
                 GameData game = games.get(i);
                 Integer gameID = game.gameID();
                 String gameName = game.gameName();
                 String white = game.whiteUsername();
                 String black = game.blackUsername();
-                System.out.println(gameID + ".   Game name: " + gameName + "   White: " + white + "   Black: " + black);
+                System.out.println((i + 1) + ".   Game name: " + gameName + "   White: " + white + "   Black: " + black);
             }
         } catch (Exception e){
             System.out.println("Error listing games, please try again shortly " + e.getMessage());
@@ -86,7 +91,17 @@ public class PostloginUI {
         }
 
         String authToken = state.getAuthToken();
-        Integer gameID = Integer.parseInt(args[0]);
+        try {
+            List<GameData> games = state.getLastListedGames();
+            Integer gameNum = Integer.parseInt(args[0]) - 1;
+            Integer gameID = games.get(gameNum).gameID();
+        } catch (Exception e){
+            System.out.println("Please make sure to order as <GAME ID> <USERNAME> <DESIRED COLOR>");
+            return;
+        }
+        List<GameData> games = state.getLastListedGames();
+        Integer gameNum = Integer.parseInt(args[0]) - 1;
+        Integer gameID = games.get(gameNum).gameID();
         String username = args[1];
         ChessGame.TeamColor playerColor = null;
 
@@ -104,7 +119,7 @@ public class PostloginUI {
             state.joinGame(gameID, playerColor);
             System.out.println("Joined game as " + playerColor);
         } catch (Exception e){
-            System.out.println("Error joining game, please try again shortly");
+            System.out.println("Error joining game, color already chosen or game does not exist");
         }
     }
 
@@ -116,12 +131,40 @@ public class PostloginUI {
         }
 
         String authToken = state.getAuthToken();
-        Integer gameID = Integer.parseInt(args[0]);
         String username = args[1];
         ChessGame.TeamColor playerColor = null;
 
+        List<GameData> games = state.getLastListedGames();
+        if (games == null){
+            System.out.println("List games first, or there are no games");
+            return;
+        }
+        if (Integer.parseInt(args[0]) + 2 > games.size() || Integer.parseInt(args[0]) < 1){
+            System.out.println("Please choose a valid number");
+            return;
+        }
+        Integer gameNum = Integer.parseInt(args[0]) - 1;
+        Integer gameID = games.get(gameNum).gameID();
+
+        boolean found = false;
+
         try {
             // Confirm the game exists, go to gameplayUI
+            for (GameData game : games){
+                if (game.gameID() == gameID){
+                    found = true;
+                    break;
+                }
+            }
+
+            if (!found){
+                System.out.println("Game does not exist");
+                return;
+            } else {
+                state.setCurrentGameID(gameID);
+                state.setPlayerColor(ChessGame.TeamColor.WHITE);
+                System.out.println("Viewing game");
+            }
         } catch (Exception e){
             System.out.println("Error joining as an observer, please try again shortly");
         }

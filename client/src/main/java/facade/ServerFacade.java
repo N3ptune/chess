@@ -6,6 +6,7 @@ import model.AuthData;
 import model.GameData;
 import model.request.*;
 import model.result.CreateGameResult;
+import model.result.JoinGameResult;
 import model.result.ListGamesResult;
 
 import java.io.*;
@@ -52,9 +53,13 @@ public class ServerFacade {
         return result.games();
     }
 
-    public void joinGame(Integer gameID, String username, ChessGame.TeamColor playerColor, String authToken){
+    public void joinGame(Integer gameID, String username, ChessGame.TeamColor playerColor, String authToken) throws IOException {
         JoinGameRequest joinGameRequest = new JoinGameRequest(authToken, playerColor, gameID);
-        makeRequest("PUT", "/game", joinGameRequest, null, authToken);
+        JoinGameResult result = makeRequest("PUT", "/game", joinGameRequest, JoinGameResult.class, authToken);
+        if (result.message() != null) {
+            // This is for the rare case where HTTP status is 200 but error is still reported in the body
+            throw new IOException(result.message());
+        }
     }
 
     public <T>T makeRequest(String method, String path, Object request, Class<T> responseClass, String authToken){
@@ -98,10 +103,17 @@ public class ServerFacade {
             responseBody = http.getInputStream();
         } else {
             responseBody = http.getErrorStream();
+            throw new IOException("Http error code" + http.getResponseCode());
         }
 
         try (InputStreamReader reader = new InputStreamReader(responseBody)){
-            return new Gson().fromJson(reader, responseClass);
+            T response = new Gson().fromJson(reader, responseClass);
+
+            if (http.getResponseCode() < 200 || http.getResponseCode() > 300){
+                throw new IOException("Http error code" + http.getResponseCode());
+            }
+
+            return response;
         }
     }
 }

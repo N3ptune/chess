@@ -22,6 +22,7 @@ public class PreloginUI {
         System.out.println("Login as an existing user: \"l\", \"login\" <USERNAME> <PASSWORD>");
         System.out.println("Register as a new user: \"r\", \"register\" <USERNAME> <PASSWORD> <EMAIL>");
         System.out.println("Exit the program \"q\", \"quit\"");
+        System.out.println("See all commands \"help\"");
         System.out.println("Chess >>> ");
     }
 
@@ -38,7 +39,7 @@ public class PreloginUI {
             AuthData authData = facade.register(username, password, email);
             state.login(authData, username);
         } catch (Exception e) {
-            System.out.println("Registration unsuccesful. Please try again shortly.");
+            System.out.println("Registration unsuccesful, username already taken");
         }
     }
 

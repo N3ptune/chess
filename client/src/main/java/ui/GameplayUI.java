@@ -21,6 +21,7 @@ public class GameplayUI {
     }
     private static void showHelp(){
         System.out.println("Nothing to see here yet :)");
+        System.out.println("See all commands \"help\"");
     }
 
     public static void writeBoard(ChessGame.TeamColor perspective, ClientState state, ServerFacade facade){
@@ -50,7 +51,7 @@ public class GameplayUI {
                     ChessPiece piece = board.getPiece(new ChessPosition(row, file + 1));
                     boolean lightSquare = (row + file) % 2 == 0;
 
-                    System.out.print(lightSquare ? EscapeSequences.SET_BG_COLOR_DARK_GREY : EscapeSequences.SET_BG_COLOR_DARK_GREY);
+                    System.out.print(lightSquare ? EscapeSequences.SET_BG_COLOR_LIGHT_GREY : EscapeSequences.SET_BG_COLOR_DARK_GREY);
 
                     if (piece == null){
                         System.out.print(EscapeSequences.EMPTY);

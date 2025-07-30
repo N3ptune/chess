@@ -2,6 +2,9 @@ package state;
 
 import chess.ChessGame;
 import model.AuthData;
+import model.GameData;
+
+import java.util.List;
 
 public class ClientState {
 
@@ -9,6 +12,15 @@ public class ClientState {
     private String username;
     private Integer currentGameID;
     private ChessGame.TeamColor playerColor;
+    private List<GameData> lastListedGames;
+
+    public void setLastListedGames(List<GameData> games){
+        this.lastListedGames = games;
+    }
+
+    public List<GameData> getLastListedGames(){
+        return lastListedGames;
+    }
 
     public void login(AuthData authData, String username){
         this.authToken = authData.authToken();
@@ -54,5 +66,13 @@ public class ClientState {
 
     public boolean isInGame(){
         return currentGameID != null;
+    }
+
+    public void setCurrentGameID(Integer currentGameID) {
+        this.currentGameID = currentGameID;
+    }
+
+    public void setPlayerColor(ChessGame.TeamColor playerColor){
+        this.playerColor = playerColor;
     }
 }

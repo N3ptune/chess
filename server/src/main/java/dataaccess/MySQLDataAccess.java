@@ -139,7 +139,13 @@ public class MySQLDataAccess implements DataAccess{
                         throw new DataAccessException("Game does not exist");
                     }
 
+                    String currentWhite = rs.getString("whiteUsername");
+                    String currentBlack = rs.getString("blackUsername");
+
                     if (playerColor == ChessGame.TeamColor.WHITE){
+                        if (currentWhite != null){
+                            throw new DataAccessException("Color already taken");
+                        }
                         String sqlInput = "UPDATE games SET whiteUsername =? WHERE gameID = ?";
                         try (var preparedStatement2 = conn.prepareStatement(sqlInput)){
                             preparedStatement2.setString(1, username);
@@ -147,6 +153,9 @@ public class MySQLDataAccess implements DataAccess{
                             preparedStatement2.executeUpdate();
                         }
                     } else if (playerColor == ChessGame.TeamColor.BLACK) {
+                        if (currentBlack != null){
+                            throw  new DataAccessException("Color already taken");
+                        }
                         String sqlInput = "UPDATE games SET blackUsername =? WHERE gameID = ?";
                         try (var preparedStatement2 = conn.prepareStatement(sqlInput)){
                             preparedStatement2.setString(1, username);
