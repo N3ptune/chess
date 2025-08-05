@@ -10,6 +10,7 @@ import state.ClientState;
 public class GameplayUI {
 
     public static void handleCommand(String command, String[] commandArgs, ClientState state, ServerFacade facade){
+
         switch (command){
             case "help" -> showHelp();
             case "write" -> writeBoard(state.getPlayerColor(), state, facade);
