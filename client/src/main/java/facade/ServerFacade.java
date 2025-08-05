@@ -43,6 +43,9 @@ public class ServerFacade {
     public Integer createGame(String gameName, String authToken){
         CreateGameRequest createGameRequest = new CreateGameRequest(authToken, gameName);
         var result = makeRequest("POST", "/game", createGameRequest, CreateGameResult.class, authToken);
+        if (result == null){
+            return  null;
+        }
         return result.gameID();
     }
 
@@ -50,14 +53,16 @@ public class ServerFacade {
         ListGamesRequest listGamesRequest = new ListGamesRequest(authToken);
 
         var result = makeRequest("GET", "/game", null, ListGamesResult.class, authToken);
+        if (result == null){
+            return  null;
+        }
         return result.games();
     }
 
     public void joinGame(Integer gameID, String username, ChessGame.TeamColor playerColor, String authToken) throws IOException {
         JoinGameRequest joinGameRequest = new JoinGameRequest(authToken, playerColor, gameID);
         JoinGameResult result = makeRequest("PUT", "/game", joinGameRequest, JoinGameResult.class, authToken);
-        if (result.message() != null) {
-            // This is for the rare case where HTTP status is 200 but error is still reported in the body
+        if (result != null) {
             throw new IOException(result.message());
         }
     }

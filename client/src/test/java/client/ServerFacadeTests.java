@@ -7,6 +7,7 @@ import model.GameData;
 import org.junit.jupiter.api.*;
 import server.Server;
 
+
 import java.util.Collection;
 
 
@@ -51,7 +52,7 @@ public class ServerFacadeTests {
     public void register_fail(){
         facade.register("failuser", "failpass", "failmail");
         AuthData authData = facade.register("failuser", "failpass", "failmail");
-        Assertions.assertNull(authData.authToken());
+        Assertions.assertNull(authData);
     }
 
     @Test
@@ -67,7 +68,7 @@ public class ServerFacadeTests {
     public void login_fail(){
         facade.register("testuser", "testpass", "testemail");
         AuthData authData = facade.login("testuser", "wrongpass");
-        Assertions.assertNull(authData.authToken());
+        Assertions.assertNull(authData);
     }
 
     @Test
@@ -137,6 +138,7 @@ public class ServerFacadeTests {
         AuthData authData = facade.register("testuser", "testpass", "testemail");
         facade.login("testuser", "testpass");
         Integer gameID = facade.createGame("testgame", authData.authToken());
+
         Assertions.assertDoesNotThrow(() -> facade.joinGame(9000, "testuser", ChessGame.TeamColor.WHITE, authData.authToken()));
     }
 

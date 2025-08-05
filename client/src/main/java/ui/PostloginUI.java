@@ -94,6 +94,10 @@ public class PostloginUI {
         try {
             List<GameData> games = state.getLastListedGames();
             Integer gameNum = Integer.parseInt(args[0]) - 1;
+            if (gameNum < 0 || gameNum > games.size()){
+                System.out.println("Invalid game number");
+                return;
+            }
             Integer gameID = games.get(gameNum).gameID();
         } catch (Exception e){
             System.out.println("Please make sure to order as <GAME ID> <USERNAME> <DESIRED COLOR>");
