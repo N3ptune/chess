@@ -1,8 +1,10 @@
 package websocket;
 
+import chess.ChessGame;
 import com.google.gson.Gson;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.annotations.*;
+import service.GameService;
 import websocket.commands.UserGameCommand;
 import websocket.messages.ServerMessage;
 
@@ -22,7 +24,7 @@ public class WebsocketHandler {
     }
 
     @OnWebSocketMessage
-    public void onMessage(Session session, String message){
+    public void onMessage(Session session, String message) throws IOException {
         UserGameCommand command = gson.fromJson(message, UserGameCommand.class);
 
         switch (command.getCommandType()) {
@@ -47,12 +49,42 @@ public class WebsocketHandler {
         gameSessions.get(gameID).put(session, command.getAuthToken());
     }
 
-    private void handleMove(Session session, UserGameCommand command){}
+    private void handleMove(Session session, UserGameCommand command){
+        int gameID = command.getGameID();
 
-    private void handleLeave(Session session, UserGameCommand command){}
+        ServerMessage moveMessage = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION);
+
+        try {
+            broadcast(gameID, moveMessage);
+        } catch (IOException e) {
+            System.out.println("Error: " + e.getMessage());
+        }
+    }
+
+    private void handleLeave(Session session, UserGameCommand command){
+        int gameID = command.getGameID();
+        gameSessions.getOrDefault(gameID, Map.of()).remove(session);
+
+        ServerMessage leaveMessage = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION);
+
+        try {
+            broadcast(gameID, leaveMessage);
+        } catch (IOException e) {
+            System.out.println("Error" + e.getMessage());
+        }
+    }
 
     private void handleResign(Session session, UserGameCommand command){
-        gameSessions.getOrDefault(command.getGameID(), Map.of()).remove(session);
+        int gameID = command.getGameID();
+        gameSessions.getOrDefault(gameID, Map.of()).remove(session);
+
+        ServerMessage resignMessage = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION);
+
+        try {
+            broadcast(gameID, resignMessage);
+        } catch (IOException e) {
+            System.out.println("Error: " + e.getMessage());
+        }
     }
 
     private static void broadcast(int gameID, ServerMessage message) throws IOException {
