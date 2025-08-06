@@ -1,9 +1,6 @@
 package ui;
 
-import chess.ChessBoard;
-import chess.ChessGame;
-import chess.ChessPiece;
-import chess.ChessPosition;
+import chess.*;
 import facade.ServerFacade;
 import state.ClientState;
 
@@ -26,7 +23,7 @@ public class GameplayUI {
     private static void showHelp(){
         System.out.println("See all commands: \"help\"");
         System.out.println("Redraw the current board: \"redraw\"");
-        System.out.println("Make a move in the game you are in (must be a player in the game): \"move\"");
+        System.out.println("Make a move in the game you are in (must be a player in the game) (If no promotion applies, type null): \"move <START SQUARE> <END SQUARE> <PROMOTION PIECE>\"");
         System.out.println("Resign a game you are in (must be a player in the game): \"resign\"");
         System.out.println("Highlight the legal moves for a piece \"highlight <COLOR> <PIECE> <SQAURE>\"");
         System.out.println("Exit the game you are in: \"exit\"");
@@ -99,7 +96,13 @@ public class GameplayUI {
         };
     }
 
-    public static void makeMove(String[] commandArgs, ClientState state, ServerFacade facade){}
+    public static void makeMove(String[] commandArgs, ClientState state, ServerFacade facade){
+//        int startSquare = commandArgs[0];
+//        String endSquare = commandArgs[1];
+//        String promotionPiece = commandArgs[2];
+//        ChessPosition start = new ChessPosition(commandArgs[0]);
+//        ChessMove move = new ChessMove(startSquare, endSquare, promotionPiece)
+    }
 
     public static void resignGame(ClientState state, ServerFacade facade){}
 
