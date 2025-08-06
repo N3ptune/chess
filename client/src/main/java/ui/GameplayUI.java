@@ -13,7 +13,10 @@ public class GameplayUI {
 
         switch (command){
             case "help" -> showHelp();
-            case "write" -> writeBoard(state.getPlayerColor(), state, facade);
+            case "redraw" -> writeBoard(state.getPlayerColor(), state, facade);
+            case "move" -> makeMove(commandArgs, state, facade);
+            case "resign" -> resignGame(state, facade);
+            case "highlight" -> highlightMoves(commandArgs, state, facade);
             case "exit" -> {
                 state.exitGame();
             }
@@ -91,4 +94,10 @@ public class GameplayUI {
                     ? EscapeSequences.WHITE_PAWN : EscapeSequences.BLACK_PAWN;
         };
     }
+
+    public static void makeMove(String[] commandArgs, ClientState state, ServerFacade facade){}
+
+    public static void resignGame(ClientState state, ServerFacade facade){}
+
+    public static void highlightMoves(String[] commandArgs, ClientState state, ServerFacade facade){}
 }
