@@ -24,8 +24,12 @@ public class GameplayUI {
         }
     }
     private static void showHelp(){
-        System.out.println("Nothing to see here yet :)");
-        System.out.println("See all commands \"help\"");
+        System.out.println("See all commands: \"help\"");
+        System.out.println("Redraw the current board: \"redraw\"");
+        System.out.println("Make a move in the game you are in (must be a player in the game): \"move\"");
+        System.out.println("Resign a game you are in (must be a player in the game): \"resign\"");
+        System.out.println("Highlight the legal moves for a piece \"highlight <COLOR> <PIECE> <SQAURE>\"");
+        System.out.println("Exit the game you are in: \"exit\"");
     }
 
     public static void writeBoard(ChessGame.TeamColor perspective, ClientState state, ServerFacade facade){
