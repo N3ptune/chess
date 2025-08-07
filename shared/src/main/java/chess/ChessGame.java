@@ -14,19 +14,28 @@ public class ChessGame {
 
     private TeamColor teamTurn = TeamColor.WHITE;
     private ChessBoard board = new ChessBoard();
+    private boolean gameOver = false;
+
+    public boolean isGameOver(){
+        return gameOver;
+    }
 
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        ChessGame chessGame = (ChessGame) o;
-        return teamTurn == chessGame.teamTurn && Objects.equals(board, chessGame.board);
+        ChessGame game = (ChessGame) o;
+        return gameOver == game.gameOver && teamTurn == game.teamTurn && Objects.equals(board, game.board);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(teamTurn, board);
+        return Objects.hash(teamTurn, board, gameOver);
+    }
+
+    public void setGameOver(boolean gameOver) {
+        this.gameOver = gameOver;
     }
 
     public ChessGame() {

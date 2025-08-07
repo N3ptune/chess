@@ -211,12 +211,13 @@ public class WebsocketHandler {
                 return;
             }
 
-            if (isGameOver(game)){
-                return;
-            }
+            game.setGameOver(true);
+            dataAccess.updateGame(gameID, game);
+
 
             NotificationMessage notificationMessage = new NotificationMessage(username + " has resigned");
             broadcast(gameID, notificationMessage);
+
 
         } catch (Exception e){
             ErrorMessage errorMessage = new ErrorMessage("Error: " + e.getMessage());
@@ -302,6 +303,7 @@ public class WebsocketHandler {
         return  game.isInCheckmate(ChessGame.TeamColor.WHITE) ||
                 game.isInCheckmate(ChessGame.TeamColor.BLACK) ||
                 game.isInStalemate(ChessGame.TeamColor.WHITE) ||
-                game.isInStalemate(ChessGame.TeamColor.BLACK);
+                game.isInStalemate(ChessGame.TeamColor.BLACK) ||
+                game.isGameOver();
     }
 }
