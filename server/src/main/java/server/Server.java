@@ -2,8 +2,8 @@ package server;
 
 import dataaccess.DataAccess;
 import dataaccess.DataAccessException;
-import dataaccess.MemoryDAO;
 import dataaccess.MySQLDataAccess;
+import org.eclipse.jetty.websocket.server.WebSocketHandler;
 import service.ClearService;
 import service.GameService;
 import service.UserService;
@@ -24,7 +24,8 @@ public class Server {
             return -1;
         }
 
-        Spark.webSocket("/ws", new WebsocketHandler(dao));
+        WebsocketHandler.setDataAccess(dao);
+        Spark.webSocket("/ws", new WebsocketHandler());
 
         UserService userService = new UserService(dao);
         GameService gameService = new GameService(dao);

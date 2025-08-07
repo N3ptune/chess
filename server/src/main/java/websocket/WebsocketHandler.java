@@ -27,10 +27,13 @@ import java.util.Objects;
 public class WebsocketHandler {
     private static Gson gson = new Gson();
     private static Map<Integer, Map<Session, String>> gameSessions = new HashMap<>();
-    private DataAccess dataAccess;
+    public static DataAccess dataAccess;
 
-    public WebsocketHandler(DataAccess dataAccess){
-        this.dataAccess = dataAccess;
+    public WebsocketHandler(){
+    }
+
+    public static void setDataAccess(DataAccess dao){
+        WebsocketHandler.dataAccess = dao;
     }
 
     @OnWebSocketConnect
@@ -51,7 +54,7 @@ public class WebsocketHandler {
     }
 
     @OnWebSocketClose
-    public void onClose(Session session, int statusCode){
+    public void onClose(Session session, int statusCode, String reason){
         for (Map<Session, String> clients : gameSessions.values()){
             clients.remove(session);
         }
