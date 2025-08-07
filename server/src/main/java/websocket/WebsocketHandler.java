@@ -211,6 +211,12 @@ public class WebsocketHandler {
                 return;
             }
 
+            if (game.isGameOver()){
+                ErrorMessage errorMessage = new ErrorMessage("Error: game is already over");
+                session.getRemote().sendString(gson.toJson(errorMessage));
+                return;
+            }
+
             game.setGameOver(true);
             dataAccess.updateGame(gameID, game);
 
