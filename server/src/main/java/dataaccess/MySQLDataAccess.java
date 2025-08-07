@@ -220,7 +220,7 @@ public class MySQLDataAccess implements DataAccess{
                     }
                 }
 
-                return 0;
+                return 1;
             } catch (SQLException e) {
                 throw new DataAccessException("SQL error: " + e.getMessage());
             }

@@ -43,13 +43,30 @@ public class WebsocketHandler {
 
     @OnWebSocketMessage
     public void onMessage(Session session, String message) throws IOException {
-        UserGameCommand command = gson.fromJson(message, UserGameCommand.class);
+        UserGameCommand baseCommand = gson.fromJson(message, UserGameCommand.class);
 
-        switch (command.getCommandType()) {
-            case CONNECT -> handleConnect(session, command);
-            case MAKE_MOVE -> handleMove(session, command);
-            case LEAVE -> handleLeave(session, command);
-            case RESIGN -> handleResign(session, command);
+        switch (baseCommand.getCommandType()) {
+            case CONNECT -> {
+                UserGameCommand command = gson.fromJson(message, UserGameCommand.class);
+                handleConnect(session, command);
+            }
+            case MAKE_MOVE -> {
+                MakeMoveCommand command = gson.fromJson(message, MakeMoveCommand.class);
+                handleMove(session, command);
+            }
+            case LEAVE ->  {
+                UserGameCommand command = gson.fromJson(message, UserGameCommand.class);
+                handleLeave(session, command);
+            }
+            case RESIGN -> {
+                UserGameCommand command = gson.fromJson(message, UserGameCommand.class);
+                handleResign(session, command);
+            }
+            default -> {
+                ErrorMessage errorMessage = new ErrorMessage("Error: unknown command type");
+                session.getRemote().sendString(gson.toJson(errorMessage));
+                return;
+            }
         }
     }
 
@@ -91,7 +108,7 @@ public class WebsocketHandler {
         }
     }
 
-    private void handleMove(Session session, UserGameCommand command) throws IOException {
+    private void handleMove(Session session, MakeMoveCommand command) throws IOException {
         int gameID = command.getGameID();
 
         try {
@@ -102,46 +119,40 @@ public class WebsocketHandler {
                 return;
             }
 
-
-
             String username = authData.username();
-
             ChessGame game = gameData.game();
 
             if (isGameOver(game)){
+                ErrorMessage errorMessage = new ErrorMessage("Error: game is over");
+                session.getRemote().sendString(gson.toJson(errorMessage));
                 return;
             }
 
             ChessGame.TeamColor playerColor = getPlayerColor(username, gameData);
             if (playerColor == null){
                 ErrorMessage errorMessage = new ErrorMessage("Error: you are not a player");
-                broadcast(gameID, errorMessage);
+                session.getRemote().sendString(gson.toJson(errorMessage));
                 return;
             }
 
             if (game.getTeamTurn() != playerColor){
                 ErrorMessage errorMessage = new ErrorMessage("Error: it's not your turn");
-                broadcast(gameID, errorMessage);
+                session.getRemote().sendString(gson.toJson(errorMessage));
                 return;
             }
 
-            MakeMoveCommand makeMoveCommand = (MakeMoveCommand) command;
-            ChessMove move = makeMoveCommand.getMove();
+            ChessMove move = command.getMove();
 
             game.makeMove(move);
             dataAccess.updateGame(gameID, game);
 
             NotificationMessage notificationMessage = new NotificationMessage(username + " made move: " + move);
-            broadcast(gameID, notificationMessage);
+            broadcastToOthers(gameID, notificationMessage, session);
 
             LoadGameMessage loadGameMessage = new LoadGameMessage(game);
             broadcast(gameID, loadGameMessage);
 
             checkGameState(gameID, game);
-
-            if (isGameOver(game)){
-                return;
-            }
 
         } catch (Exception e){
             ErrorMessage errorMessage = new ErrorMessage("Error: " + e.getMessage());
