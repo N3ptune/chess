@@ -219,7 +219,6 @@ public class MySQLDataAccess implements DataAccess{
                         return rs.getInt(1);
                     }
                 }
-
                 return 1;
             } catch (SQLException e) {
                 throw new DataAccessException("SQL error: " + e.getMessage());

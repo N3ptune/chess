@@ -156,7 +156,7 @@ public class WebsocketHandler {
 
         } catch (Exception e){
             ErrorMessage errorMessage = new ErrorMessage("Error: " + e.getMessage());
-            broadcast(gameID, errorMessage);
+            session.getRemote().sendString(gson.toJson(errorMessage));
         }
     }
 
@@ -207,7 +207,7 @@ public class WebsocketHandler {
             ChessGame.TeamColor playerColor = getPlayerColor(username, gameData);
             if (playerColor == null){
                 ErrorMessage errorMessage = new ErrorMessage("Error: you are not a player");
-                broadcast(gameID, errorMessage);
+                session.getRemote().sendString(gson.toJson(errorMessage));
                 return;
             }
 
