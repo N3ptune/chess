@@ -19,4 +19,5 @@ public interface DataAccess {
     Collection<GameData> listGames() throws DataAccessException;
     void joinGame(int gameID, String username, ChessGame.TeamColor playerColor) throws DataAccessException, SQLException;
     void deleteAuth(String authToken) throws DataAccessException;
+    void updateGame(int gameID, ChessGame game) throws DataAccessException, SQLException;
 }

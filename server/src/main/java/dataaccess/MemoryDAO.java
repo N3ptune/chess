@@ -5,6 +5,7 @@ import model.AuthData;
 import model.GameData;
 import model.UserData;
 
+import java.sql.SQLException;
 import java.util.*;
 
 public class MemoryDAO implements DataAccess{
@@ -94,5 +95,10 @@ public class MemoryDAO implements DataAccess{
             throw new DataAccessException("Auth token not found");
         }
         authTokens.remove(authToken);
+    }
+
+    @Override
+    public void updateGame(int gameID, ChessGame game) throws DataAccessException, SQLException {
+
     }
 }

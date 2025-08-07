@@ -8,6 +8,7 @@ import service.ClearService;
 import service.GameService;
 import service.UserService;
 import spark.*;
+import websocket.WebsocketHandler;
 
 public class Server {
 
@@ -22,6 +23,8 @@ public class Server {
         } catch (DataAccessException e) {
             return -1;
         }
+
+        Spark.webSocket("/ws", new WebsocketHandler(dao));
 
         UserService userService = new UserService(dao);
         GameService gameService = new GameService(dao);
