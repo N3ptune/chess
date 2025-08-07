@@ -84,7 +84,7 @@ public class WebsocketHandler {
 
             String role = determineRole(username, gameData);
             NotificationMessage notificationMessage = new NotificationMessage(username + " has joined the game as: " + role);
-            broadcast(gameID, notificationMessage);
+            broadcastToOthers(gameID, notificationMessage, session);
         } catch (Exception e) {
             ErrorMessage errorMessage = new ErrorMessage("Error: " + e.getMessage());
             broadcast(gameID, errorMessage);
@@ -259,6 +259,15 @@ public class WebsocketHandler {
         String json = gson.toJson(message);
         for (Session s : gameSessions.getOrDefault(gameID, Map.of()).keySet()){
             if (s.isOpen()){
+                s.getRemote().sendString(json);
+            }
+        }
+    }
+
+    private static void broadcastToOthers(int gameID, ServerMessage message, Session excludeSession) throws IOException {
+        String json = gson.toJson(message);
+        for (Session s : gameSessions.getOrDefault(gameID, Map.of()).keySet()){
+            if (s.isOpen() && !s.equals(excludeSession)){
                 s.getRemote().sendString(json);
             }
         }
