@@ -70,7 +70,7 @@ public class WebsocketHandler {
             AuthData authData = dataAccess.getAuth(command.getAuthToken());
             GameData gameData = dataAccess.getGame(gameID);
 
-            if (!validationchecks(authData, gameData, gameID, command)){
+            if (!validationchecks(session, authData, gameData, gameID, command)){
                 return;
             }
 
@@ -98,7 +98,7 @@ public class WebsocketHandler {
             AuthData authData = dataAccess.getAuth(command.getAuthToken());
             GameData gameData = dataAccess.getGame(gameID);
 
-            if (!validationchecks(authData, gameData, gameID, command)){
+            if (!validationchecks(session, authData, gameData, gameID, command)){
                 return;
             }
 
@@ -156,7 +156,7 @@ public class WebsocketHandler {
             AuthData authData = dataAccess.getAuth(command.getAuthToken());
             GameData gameData = dataAccess.getGame(gameID);
 
-            if (!validationchecks(authData, gameData, gameID, command)){
+            if (!validationchecks(session, authData, gameData, gameID, command)){
                 return;
             }
 
@@ -186,7 +186,7 @@ public class WebsocketHandler {
             AuthData authData = dataAccess.getAuth(command.getAuthToken());
             GameData gameData = dataAccess.getGame(gameID);
 
-            if (!validationchecks(authData, gameData, gameID, command)){
+            if (!validationchecks(session, authData, gameData, gameID, command)){
                 return;
             }
 
@@ -273,15 +273,15 @@ public class WebsocketHandler {
         }
     }
 
-    private boolean validationchecks(AuthData authData, GameData gameData, int gameID, UserGameCommand command) throws DataAccessException, IOException, SQLException {
+    private boolean validationchecks(Session session, AuthData authData, GameData gameData, int gameID, UserGameCommand command) throws DataAccessException, IOException, SQLException {
         if (authData == null){
             ErrorMessage errorMessage = new ErrorMessage("Error: invalid auth token");
-            broadcast(gameID, errorMessage);
+            session.getRemote().sendString(gson.toJson(errorMessage));
             return false;
         }
         if (gameData == null){
             ErrorMessage errorMessage = new ErrorMessage("Error: game does not exist");
-            broadcast(gameID, errorMessage);
+            session.getRemote().sendString(gson.toJson(errorMessage));
             return false;
         }
         return true;
