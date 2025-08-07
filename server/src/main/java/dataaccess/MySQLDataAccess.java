@@ -174,7 +174,7 @@ public class MySQLDataAccess implements DataAccess{
     public void deleteAuth(String authToken) throws DataAccessException {
 
         try {
-            if (executeUpdate("DELETE FROM auth WHERE token = ?", authToken) != 0){
+            if (executeUpdate("DELETE FROM auth WHERE token = ?", authToken) == 0){
                 throw new DataAccessException("Auth token not found");
             }
         } catch (Exception e){
