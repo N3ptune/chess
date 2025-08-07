@@ -143,7 +143,7 @@ public class MySQLDataAccess implements DataAccess{
                     String currentBlack = rs.getString("blackUsername");
 
                     if (playerColor == ChessGame.TeamColor.WHITE){
-                        if (currentWhite != null){
+                        if (username != null && currentWhite != null){
                             throw new DataAccessException("Color already taken");
                         }
                         String sqlInput = "UPDATE games SET whiteUsername =? WHERE gameID = ?";
@@ -153,7 +153,7 @@ public class MySQLDataAccess implements DataAccess{
                             preparedStatement2.executeUpdate();
                         }
                     } else if (playerColor == ChessGame.TeamColor.BLACK) {
-                        if (currentBlack != null){
+                        if (username != null && currentBlack != null){
                             throw  new DataAccessException("Color already taken");
                         }
                         String sqlInput = "UPDATE games SET blackUsername =? WHERE gameID = ?";
