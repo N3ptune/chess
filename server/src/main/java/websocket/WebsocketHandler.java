@@ -174,9 +174,9 @@ public class WebsocketHandler {
             String username = authData.username();
 
             if (username.equals(gameData.whiteUsername())){
-                dataAccess.joinGame(gameID, null, ChessGame.TeamColor.WHITE);
+                dataAccess.joinGame(gameID, "leave", ChessGame.TeamColor.WHITE);
             } else if (username.equals(gameData.blackUsername())){
-                dataAccess.joinGame(gameID, null, ChessGame.TeamColor.BLACK);
+                dataAccess.joinGame(gameID, "leave", ChessGame.TeamColor.BLACK);
             }
 
             gameSessions.getOrDefault(gameID, Map.of()).remove(session);

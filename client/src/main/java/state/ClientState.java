@@ -3,6 +3,7 @@ package state;
 import chess.ChessGame;
 import model.AuthData;
 import model.GameData;
+import websocket.GameClientEndpoint;
 
 import java.util.List;
 
@@ -13,6 +14,24 @@ public class ClientState {
     private Integer currentGameID;
     private ChessGame.TeamColor playerColor;
     private List<GameData> lastListedGames;
+    private GameClientEndpoint endpoint;
+    private ChessGame game;
+
+    public void setEndpoint(GameClientEndpoint endpoint){
+        this.endpoint = endpoint;
+    }
+
+    public GameClientEndpoint getEndpoint() {
+        return endpoint;
+    }
+
+    public void setGame(ChessGame game) {
+        this.game = game;
+    }
+
+    public ChessGame getGame() {
+        return game;
+    }
 
     public void setLastListedGames(List<GameData> games){
         this.lastListedGames = games;

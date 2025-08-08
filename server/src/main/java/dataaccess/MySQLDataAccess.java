@@ -12,6 +12,7 @@ import java.sql.Statement;
 import java.sql.Types;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Locale;
 import java.util.UUID;
 
 public class MySQLDataAccess implements DataAccess{
@@ -142,23 +143,25 @@ public class MySQLDataAccess implements DataAccess{
                     String currentWhite = rs.getString("whiteUsername");
                     String currentBlack = rs.getString("blackUsername");
 
+                    boolean isLeaving = username.equalsIgnoreCase("leave");
+
                     if (playerColor == ChessGame.TeamColor.WHITE){
-                        if (username != null && currentWhite != null){
+                        if (!username.equalsIgnoreCase("leave") && currentWhite != null){
                             throw new DataAccessException("Color already taken");
                         }
                         String sqlInput = "UPDATE games SET whiteUsername =? WHERE gameID = ?";
                         try (var preparedStatement2 = conn.prepareStatement(sqlInput)){
-                            preparedStatement2.setString(1, username);
+                            preparedStatement2.setString(1, isLeaving ? null : username);
                             preparedStatement2.setInt(2, gameID);
                             preparedStatement2.executeUpdate();
                         }
                     } else if (playerColor == ChessGame.TeamColor.BLACK) {
-                        if (username != null && currentBlack != null){
+                        if (!username.equalsIgnoreCase("leave") && currentBlack != null){
                             throw  new DataAccessException("Color already taken");
                         }
                         String sqlInput = "UPDATE games SET blackUsername =? WHERE gameID = ?";
                         try (var preparedStatement2 = conn.prepareStatement(sqlInput)){
-                            preparedStatement2.setString(1, username);
+                            preparedStatement2.setString(1, isLeaving ? null : username);
                             preparedStatement2.setInt(2, gameID);
                             preparedStatement2.executeUpdate();
                         }

@@ -62,7 +62,10 @@ public class ServerFacade {
     public void joinGame(Integer gameID, String username, ChessGame.TeamColor playerColor, String authToken) throws IOException {
         JoinGameRequest joinGameRequest = new JoinGameRequest(authToken, playerColor, gameID);
         JoinGameResult result = makeRequest("PUT", "/game", joinGameRequest, JoinGameResult.class, authToken);
-        if (result != null) {
+        if (result == null){
+            throw new IOException();
+        }
+        if (result.message() != null ) {
             throw new IOException(result.message());
         }
     }

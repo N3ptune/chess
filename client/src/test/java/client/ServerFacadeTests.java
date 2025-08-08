@@ -8,6 +8,7 @@ import org.junit.jupiter.api.*;
 import server.Server;
 
 
+import java.io.IOException;
 import java.util.Collection;
 
 
@@ -139,7 +140,7 @@ public class ServerFacadeTests {
         facade.login("testuser", "testpass");
         Integer gameID = facade.createGame("testgame", authData.authToken());
 
-        Assertions.assertDoesNotThrow(() -> facade.joinGame(9000, "testuser", ChessGame.TeamColor.WHITE, authData.authToken()));
+        Assertions.assertThrows(IOException.class, () -> facade.joinGame(9000, "testuser", ChessGame.TeamColor.WHITE, authData.authToken()));
     }
 
 }

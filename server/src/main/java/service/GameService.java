@@ -45,6 +45,10 @@ public class GameService{
 
             GameData game = dao.getGame(joinGame.gameID());
 
+            if (game == null){
+                return new JoinGameResult("Error: game does not exist");
+            }
+
 
             if (!joinGame.authToken().equals(authData.authToken())){
                 return new JoinGameResult("Error: unauthorized");

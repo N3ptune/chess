@@ -3,6 +3,8 @@ package ui;
 import chess.*;
 import facade.ServerFacade;
 import state.ClientState;
+import websocket.commands.MakeMoveCommand;
+import websocket.commands.UserGameCommand;
 
 public class GameplayUI {
 
@@ -10,11 +12,13 @@ public class GameplayUI {
 
         switch (command){
             case "help" -> showHelp();
-            case "redraw" -> writeBoard(state.getPlayerColor(), state, facade);
+            case "redraw" -> writeBoard(state.getPlayerColor(), state, facade, commandArgs);
             case "move" -> makeMove(commandArgs, state, facade);
             case "resign" -> resignGame(state, facade);
-            case "highlight" -> highlightMoves(commandArgs, state, facade);
+            case "highlight" -> writeBoard(state.getPlayerColor(), state, facade, commandArgs);
             case "exit" -> {
+                UserGameCommand userGameCommand = new UserGameCommand(UserGameCommand.CommandType.LEAVE, state.getAuthToken(), state.getCurrentGameID());
+                state.getEndpoint().sendMessage(userGameCommand);
                 state.exitGame();
             }
             default -> System.out.println("Command not recognized. Please try again or type \"help\" for a list of available commands.");
@@ -25,11 +29,13 @@ public class GameplayUI {
         System.out.println("Redraw the current board: \"redraw\"");
         System.out.println("Make a move in the game you are in (must be a player in the game) (If no promotion applies, type null): \"move <START SQUARE> <END SQUARE> <PROMOTION PIECE>\"");
         System.out.println("Resign a game you are in (must be a player in the game): \"resign\"");
-        System.out.println("Highlight the legal moves for a piece \"highlight <COLOR> <PIECE> <SQAURE>\"");
+        System.out.println("Highlight the legal moves for a piece \"highlight <SQAURE>\"");
         System.out.println("Exit the game you are in: \"exit\"");
     }
 
-    public static void writeBoard(ChessGame.TeamColor perspective, ClientState state, ServerFacade facade){
+    public static void writeBoard(ChessGame.TeamColor perspective, ClientState state, ServerFacade facade, String[] commandArgs){
+
+        ChessPosition position = parsePosition(commandArgs[0]);
 
         ChessGame game = new ChessGame();
         ChessBoard board = game.getBoard();
@@ -97,14 +103,30 @@ public class GameplayUI {
     }
 
     public static void makeMove(String[] commandArgs, ClientState state, ServerFacade facade){
-//        int startSquare = commandArgs[0];
-//        String endSquare = commandArgs[1];
-//        String promotionPiece = commandArgs[2];
-//        ChessPosition start = new ChessPosition(commandArgs[0]);
-//        ChessMove move = new ChessMove(startSquare, endSquare, promotionPiece)
+        try {
+            ChessPosition start = parsePosition(commandArgs[0]);
+            ChessPosition end = parsePosition(commandArgs[1]);
+
+            ChessPiece.PieceType promotionPiece = ChessPiece.PieceType.valueOf(commandArgs[2].toUpperCase());
+
+            ChessMove move = new ChessMove(start, end, promotionPiece);
+            MakeMoveCommand command = new MakeMoveCommand(state.getAuthToken(), state.getCurrentGameID(), move);
+            state.getEndpoint().sendMessage(command);
+        } catch (Exception e) {
+            System.out.println("Error: " + e.getMessage());
+        }
     }
 
-    public static void resignGame(ClientState state, ServerFacade facade){}
+    public static void resignGame(ClientState state, ServerFacade facade){
+        UserGameCommand command = new UserGameCommand(UserGameCommand.CommandType.RESIGN, state.getAuthToken(), state.getCurrentGameID());
+        state.getEndpoint().sendMessage(command);
+    }
 
     public static void highlightMoves(String[] commandArgs, ClientState state, ServerFacade facade){}
+
+    public static ChessPosition parsePosition(String square){
+        int highCol = square.charAt(0) - 'a' + 1;
+        int highRow = Character.getNumericValue(square.charAt(1));
+        return new ChessPosition(highRow, highCol);
+    }
 }
