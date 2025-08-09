@@ -144,7 +144,7 @@ public class PostloginUI {
                 state.setEndpoint(endpoint);
 
                 UserGameCommand joinCommand = new UserGameCommand(UserGameCommand.CommandType.CONNECT, authToken, gameID);
-                endpoint.sendMessage(endpoint);
+                endpoint.sendMessage(joinCommand);
             } catch (Exception e) {
                 System.out.println("Could not connect to WebSocket");
                 return;
