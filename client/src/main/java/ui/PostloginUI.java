@@ -4,10 +4,20 @@ import chess.ChessGame;
 import facade.ServerFacade;
 import model.GameData;
 import model.result.ListGamesResult;
+import org.eclipse.jetty.websocket.api.Session;
+import org.eclipse.jetty.websocket.client.WebSocketClient;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import state.ClientState;
+import websocket.GameClientEndpoint;
+import websocket.commands.UserGameCommand;
+
+import java.net.URI;
 import java.util.List;
 
 public class PostloginUI {
+
+    private static final Logger log = LoggerFactory.getLogger(PostloginUI.class);
 
     public static void handleCommand(String command, String[] commandArgs, ClientState state, ServerFacade facade){
         switch (command) {
@@ -120,6 +130,25 @@ public class PostloginUI {
 
         try {
             facade.joinGame(gameID, username, playerColor, authToken);
+            try {
+                GameplayUI gameplayUI = new GameplayUI();
+                GameClientEndpoint endpoint = new GameClientEndpoint(state, gameplayUI);
+
+                WebSocketClient client = new WebSocketClient();
+                client.start();
+
+                URI serverUri = URI.create("ws://localhost:8080/ws");
+
+                Session session = client.connect(endpoint, serverUri).get();
+
+                state.setEndpoint(endpoint);
+
+                UserGameCommand joinCommand = new UserGameCommand(UserGameCommand.CommandType.CONNECT, authToken, gameID);
+                endpoint.sendMessage(endpoint);
+            } catch (Exception e) {
+                System.out.println("Could not connect to WebSocket");
+                return;
+            }
             state.joinGame(gameID, playerColor);
             System.out.println("Joined game as " + playerColor);
         } catch (Exception e){
