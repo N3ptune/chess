@@ -39,7 +39,7 @@ public class GameplayUI {
 
     public static void writeBoard(ChessGame.TeamColor perspective, ClientState state, ServerFacade facade, String[] commandArgs){
 
-        ChessGame game = new ChessGame();
+        ChessGame game = state.getGame();
         ChessBoard board = game.getBoard();
 
             System.out.print(EscapeSequences.ERASE_SCREEN);
@@ -109,7 +109,19 @@ public class GameplayUI {
             ChessPosition start = parsePosition(commandArgs[0]);
             ChessPosition end = parsePosition(commandArgs[1]);
 
-            ChessPiece.PieceType promotionPiece = ChessPiece.PieceType.valueOf(commandArgs[2].toUpperCase());
+            ChessPiece.PieceType promotionPiece;
+
+            if (commandArgs.length > 2){
+                if (commandArgs[2].equalsIgnoreCase("null")){
+                    promotionPiece = null;
+                } else {
+                    promotionPiece = ChessPiece.PieceType.valueOf(commandArgs[2].toUpperCase());
+                }
+            } else {
+                promotionPiece = null;
+            }
+
+
 
             ChessMove move = new ChessMove(start, end, promotionPiece);
             MakeMoveCommand command = new MakeMoveCommand(state.getAuthToken(), state.getCurrentGameID(), move);
