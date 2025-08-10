@@ -172,7 +172,7 @@ public class PostloginUI {
             System.out.println("List games first, or there are no games");
             return;
         }
-        if (Integer.parseInt(args[0]) + 2 > games.size() || Integer.parseInt(args[0]) < 1){
+        if (Integer.parseInt(args[0]) > games.size() || Integer.parseInt(args[0]) < 1){
             System.out.println("Please choose a valid number");
             return;
         }
@@ -182,7 +182,18 @@ public class PostloginUI {
         boolean found = false;
 
         try {
-            // Confirm the game exists, go to gameplayUI
+            GameplayUI gameplayUI = new GameplayUI();
+            GameClientEndpoint endpoint = new GameClientEndpoint(state, gameplayUI);
+
+            URI serverUri = URI.create("ws://localhost:8080/ws");
+
+            WebSocketClient client = new WebSocketClient();
+            client.start();
+
+            Session session = client.connect(endpoint, serverUri).get();
+
+            state.setEndpoint(endpoint);
+
             for (GameData game : games){
                 if (game.gameID() == gameID){
                     found = true;
@@ -194,6 +205,9 @@ public class PostloginUI {
                 System.out.println("Game does not exist");
                 return;
             } else {
+                UserGameCommand joinCommand = new UserGameCommand(UserGameCommand.CommandType.CONNECT, authToken, gameID);
+                endpoint.sendMessage(joinCommand);
+
                 state.setCurrentGameID(gameID);
                 state.setPlayerColor(ChessGame.TeamColor.WHITE);
                 System.out.println("Viewing game");
