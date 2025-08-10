@@ -6,6 +6,10 @@ import state.ClientState;
 import websocket.commands.MakeMoveCommand;
 import websocket.commands.UserGameCommand;
 
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
+
 public class GameplayUI {
 
     public static void handleCommand(String command, String[] commandArgs, ClientState state, ServerFacade facade){
@@ -128,8 +132,19 @@ public class GameplayUI {
 
         ChessPosition position = parsePosition(commandArgs[0]);
 
-        ChessGame game = new ChessGame();
+
+        ChessGame game = state.getGame();
         ChessBoard board = game.getBoard();
+
+        ChessPiece highlight = board.getPiece(position);
+
+        Collection<ChessMove> validMoves = game.validMoves(position);
+
+        Set<ChessPosition> validEndPos = new HashSet<>();
+        for (ChessMove move : validMoves){
+            validEndPos.add(move.getEndPosition());
+        }
+
 
         System.out.print(EscapeSequences.ERASE_SCREEN);
         int startRow = (perspective == ChessGame.TeamColor.WHITE) ? 8 : 1;
@@ -150,11 +165,19 @@ public class GameplayUI {
             System.out.print(" " + row + " ");
             for (int col = 0; col < 8; col++){
                 int file = (perspective == ChessGame.TeamColor.WHITE) ? col : 7-col;
+                ChessPosition current = new ChessPosition(row, file + 1);
                 ChessPiece piece = board.getPiece(new ChessPosition(row, file + 1));
                 boolean lightSquare = (row + file) % 2 == 0;
 
-                System.out.print(lightSquare ? EscapeSequences.SET_BG_COLOR_LIGHT_GREY : EscapeSequences.SET_BG_COLOR_DARK_GREY);
-
+                if (validEndPos.contains(current)){
+                    if (current.equals(position)){
+                        System.out.print(EscapeSequences.SET_BG_COLOR_DARK_GREEN);
+                    } else {
+                        System.out.print(EscapeSequences.SET_BG_COLOR_GREEN);
+                    }
+                } else {
+                    System.out.print(lightSquare ? EscapeSequences.SET_BG_COLOR_LIGHT_GREY : EscapeSequences.SET_BG_COLOR_DARK_GREY);
+                }
                 if (piece == null){
                     System.out.print(EscapeSequences.EMPTY);
                 } else {
