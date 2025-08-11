@@ -3,21 +3,15 @@ package ui;
 import chess.ChessGame;
 import facade.ServerFacade;
 import model.GameData;
-import model.result.ListGamesResult;
-import org.eclipse.jetty.websocket.api.Session;
-import org.eclipse.jetty.websocket.client.WebSocketClient;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import state.ClientState;
 import websocket.GameClientEndpoint;
 import websocket.commands.UserGameCommand;
 
+import javax.websocket.*;
 import java.net.URI;
 import java.util.List;
 
 public class PostloginUI {
-
-    private static final Logger log = LoggerFactory.getLogger(PostloginUI.class);
 
     public static void handleCommand(String command, String[] commandArgs, ClientState state, ServerFacade facade){
         switch (command) {
@@ -134,12 +128,10 @@ public class PostloginUI {
                 GameplayUI gameplayUI = new GameplayUI();
                 GameClientEndpoint endpoint = new GameClientEndpoint(state, gameplayUI);
 
-                WebSocketClient client = new WebSocketClient();
-                client.start();
-
+                WebSocketContainer container = ContainerProvider.getWebSocketContainer();
                 URI serverUri = URI.create("ws://localhost:8080/ws");
 
-                Session session = client.connect(endpoint, serverUri).get();
+                Session session = container.connectToServer(endpoint, serverUri);
 
                 state.setEndpoint(endpoint);
 
@@ -179,41 +171,24 @@ public class PostloginUI {
         Integer gameNum = Integer.parseInt(args[0]) - 1;
         Integer gameID = games.get(gameNum).gameID();
 
-        boolean found = false;
-
         try {
             GameplayUI gameplayUI = new GameplayUI();
             GameClientEndpoint endpoint = new GameClientEndpoint(state, gameplayUI);
 
+            WebSocketContainer container = ContainerProvider.getWebSocketContainer();
             URI serverUri = URI.create("ws://localhost:8080/ws");
 
-            WebSocketClient client = new WebSocketClient();
-            client.start();
-
-            Session session = client.connect(endpoint, serverUri).get();
+            Session session = container.connectToServer(endpoint, serverUri);
 
             state.setEndpoint(endpoint);
 
-            for (GameData game : games){
-                if (game.gameID() == gameID){
-                    found = true;
-                    break;
-                }
-            }
+            UserGameCommand observeCommand = new UserGameCommand(UserGameCommand.CommandType.CONNECT, authToken, gameID);
+            endpoint.sendMessage(observeCommand);
 
-            if (!found){
-                System.out.println("Game does not exist");
-                return;
-            } else {
-                UserGameCommand joinCommand = new UserGameCommand(UserGameCommand.CommandType.CONNECT, authToken, gameID);
-                endpoint.sendMessage(joinCommand);
-
-                state.setCurrentGameID(gameID);
-                state.setPlayerColor(ChessGame.TeamColor.WHITE);
-                System.out.println("Viewing game");
-            }
-        } catch (Exception e){
-            System.out.println("Error joining as an observer, please try again shortly");
+            state.joinGame(gameID, null);
+            System.out.println("Now observing game");
+        } catch (Exception e) {
+            System.out.println("Could not connect to WebSocket for observing");
         }
     }
 }
